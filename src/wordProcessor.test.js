@@ -76,8 +76,23 @@ describe("ISNAD Formatter Tests", () => {
     expect(ref.structured.authors[0].family).toBe("Akdemir");
     expect(ref.structured.authors[0].given).toBe("E.");
     
-    expect(ref.isnadBibliography).toBe("Akdemir, E.. Avrupa Bütünleşmesinin Tarihçesi. Avrupa Birliği Tarihçe, Teoriler, Kurumlar ve Politikalar İçinde Akçay, B. ve Göçmen, İ. (Editörler), (s. 37-63). Ankara: Seçkin Yayınları, 2012.");
+    expect(ref.isnadBibliography).toBe("Akdemir, E. Avrupa Bütünleşmesinin Tarihçesi. Avrupa Birliği Tarihçe, Teoriler, Kurumlar ve Politikalar İçinde Akçay, B. ve Göçmen, İ. (Editörler), (s. 37-63). Ankara: Seçkin Yayınları, 2012.");
     expect(ref.isnadFootnote).toBe("E. Akdemir, Avrupa Bütünleşmesinin Tarihçesi (Avrupa Birliği Tarihçe, Teoriler, Kurumlar ve Politikalar İçinde Akçay, B. ve Göçmen, İ. (Editörler), (s. 37-63), Ankara: Seçkin Yayınları, 2012).");
+  });
+
+  it("should parse corporate web references with AccessDate correctly", () => {
+    const text = "European Commission. (2024a). “Ninth report on the state of the energy union.” https://energy.ec.europa.eu/strategy/energy-union/ninth-report-state-energy-union_en. (Erişim Tarihi: 15.01.2025).";
+    const ref = parseReference(text, 0);
+    expect(ref).not.toBeNull();
+    expect(ref.structured.title).toBe("Ninth report on the state of the energy union");
+    expect(ref.structured.url).toBe("https://energy.ec.europa.eu/strategy/energy-union/ninth-report-state-energy-union_en");
+    expect(ref.structured.accessDate).toBe("Erişim Tarihi: 15.01.2025");
+    expect(ref.structured.authors).toHaveLength(1);
+    expect(ref.structured.authors[0].family).toBe("European Commission");
+    expect(ref.structured.authors[0].given).toBe("");
+    
+    expect(ref.isnadBibliography).toBe("European Commission. “Ninth report on the state of the energy union”. 2024a. https://energy.ec.europa.eu/strategy/energy-union/ninth-report-state-energy-union_en (Erişim Tarihi: 15.01.2025).");
+    expect(ref.isnadFootnote).toBe("European Commission, “Ninth report on the state of the energy union” (2024a), https://energy.ec.europa.eu/strategy/energy-union/ninth-report-state-energy-union_en (Erişim Tarihi: 15.01.2025).");
   });
 });
 
