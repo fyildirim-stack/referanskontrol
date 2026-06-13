@@ -33,7 +33,7 @@ describe("ISNAD Formatter Tests", () => {
     expect(ref).not.toBeNull();
     expect(ref.structured.year).toBe("2020");
     expect(ref.structured.title).toBe("Modern Web Development");
-    expect(ref.structured.container).toBe("Publishing Press");
+    expect(ref.structured.publisher).toBe("Publishing Press");
   });
 
   it("should format isnad footnote properly", () => {

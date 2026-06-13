@@ -52,6 +52,8 @@ function toCslJson(reference, index) {
     URL: item.url || undefined,
     DOI: extractDoi(reference) || undefined,
     "container-title": item.container || undefined,
+    publisher: item.publisher || undefined,
+    "publisher-place": item.place || undefined,
     note: reference.display,
   };
 }
@@ -61,6 +63,8 @@ function toRis(reference, csl) {
   (csl.author || []).forEach((author) => lines.push(`AU  - ${[author.family, author.given].filter(Boolean).join(", ")}`));
   lines.push(`TI  - ${csl.title}`);
   if (csl["container-title"]) lines.push(`T2  - ${csl["container-title"]}`);
+  if (csl.publisher) lines.push(`PB  - ${csl.publisher}`);
+  if (csl["publisher-place"]) lines.push(`CY  - ${csl["publisher-place"]}`);
   if (getIssuedYear(csl)) lines.push(`PY  - ${getIssuedYear(csl)}`);
   if (csl.DOI) lines.push(`DO  - ${csl.DOI}`);
   if (csl.URL) lines.push(`UR  - ${csl.URL}`);
@@ -71,13 +75,19 @@ function toRis(reference, csl) {
 
 function toBibtex(reference, csl) {
   const key = makeBibKey(csl);
-  const type = csl.type === "article-journal" ? "article" : csl.type === "webpage" ? "online" : "book";
+  let type = "book";
+  if (csl.type === "article-journal") type = "article";
+  else if (csl.type === "webpage") type = "online";
+  else if (csl.type === "chapter") type = "incollection";
+  
   const fields = [
     ["title", csl.title],
     ["author", (csl.author || []).map((author) => [author.given, author.family].filter(Boolean).join(" ")).join(" and ")],
     ["year", getIssuedYear(csl)],
     ["journal", csl.type === "article-journal" ? csl["container-title"] : ""],
-    ["publisher", csl.type !== "article-journal" ? csl["container-title"] : ""],
+    ["booktitle", csl.type === "chapter" ? csl["container-title"] : ""],
+    ["publisher", csl.publisher || ""],
+    ["address", csl["publisher-place"] || ""],
     ["doi", csl.DOI],
     ["url", csl.URL],
     ["note", `Original: ${reference.display}`],
@@ -118,12 +128,14 @@ function extractDoi(reference) {
 function mapCslType(type) {
   if (type === "article") return "article-journal";
   if (type === "web") return "webpage";
+  if (type === "chapter") return "chapter";
   return "book";
 }
 
 function mapRisType(type) {
   if (type === "article-journal") return "JOUR";
   if (type === "webpage") return "WEB";
+  if (type === "chapter") return "CHAP";
   return "BOOK";
 }
 

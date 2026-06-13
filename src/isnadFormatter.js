@@ -144,7 +144,23 @@ export function parseReference(text, paragraphIndex) {
 
   const url = text.match(/https?:\/\/\S+/i)?.[0]?.replace(/[).,]+$/g, "") || "";
   const doi = text.match(/https?:\/\/doi\.org\/\S+/i)?.[0]?.replace(/[).,]+$/g, "") || "";
-  const type = (doi || /\b\d+\s*\(\d+\)|\b\d+\/\d+|\bjournal|dergi|policy|reviews?|energy policy\b/i.test(container)) ? "article" : (url ? "web" : "book");
+  const isChapter = /\b(?:İçinde|In)\b/i.test(text) && !doi && !url;
+  const type = (doi || /\b\d+\s*\(\d+\)|\b\d+\/\d+|\bjournal|dergi|policy|reviews?|energy policy\b/i.test(container)) ? "article" : (url ? "web" : (isChapter ? "chapter" : "book"));
+
+  let publisher = "";
+  let place = "";
+  if (type === "book" || type === "chapter") {
+    const pubInfo = parsePublisherAndPlace(container);
+    if (pubInfo.publisher) {
+      publisher = pubInfo.publisher;
+      place = pubInfo.place;
+      if (type === "book") {
+        container = "";
+      } else {
+        container = container.replace(new RegExp(escapeRegex(publisher) + `(?:\\s*,\\s*` + escapeRegex(place) + `)?`, "i"), "").trim().replace(/[.,\s]+$/, "");
+      }
+    }
+  }
 
   const structured = {
     raw: text,
@@ -155,6 +171,8 @@ export function parseReference(text, paragraphIndex) {
     dateText,
     title,
     container,
+    publisher,
+    place,
     url,
     doi,
     type,
@@ -317,4 +335,47 @@ export function buildIsnadBibliography(references) {
 
 export function formatDateText(dateText) {
   return String(dateText).replace(/\.+$/g, "");
+}
+
+export function parsePublisherAndPlace(container) {
+  if (!container) return { publisher: "", place: "" };
+  const clean = container.replace(/[.]+$/g, "").trim();
+  
+  if (clean.includes(":")) {
+    const parts = clean.split(/\s*:\s*/);
+    return {
+      place: parts[0].trim(),
+      publisher: parts.slice(1).join(": ").trim()
+    };
+  }
+  
+  if (clean.includes(",")) {
+    const parts = clean.split(/\s*,\s*/);
+    const cities = /\b(?:ankara|istanbul|izmir|bursa|konya|sivas|london|new\s*york|boston|chicago|cambridge|oxford|seattle|san\s*francisco|paris|berlin|roma)\b/i;
+    if (cities.test(parts[0])) {
+      return {
+        place: parts[0].trim(),
+        publisher: parts.slice(1).join(", ").trim()
+      };
+    }
+    if (cities.test(parts[1])) {
+      return {
+        publisher: parts[0].trim(),
+        place: parts[1].trim()
+      };
+    }
+    return {
+      publisher: parts[0].trim(),
+      place: parts[1].trim()
+    };
+  }
+  
+  return {
+    publisher: clean,
+    place: ""
+  };
+}
+
+export function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
