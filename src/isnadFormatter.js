@@ -200,8 +200,23 @@ export function parseApaReference(text, authorSegment, yearMatch) {
 }
 
 export function splitTitleAndContainer(text) {
-  const parts = text.split(/(?<=\.)\s+(?=\p{Lu}|\d)/u).map((part) => part.trim()).filter(Boolean);
-  if (!parts.length) return { title: text, container: "" };
+  const rawParts = text.split(/(?<=\.)\s+(?=\p{Lu}|\d)/u).map((part) => part.trim()).filter(Boolean);
+  if (!rawParts.length) return { title: text, container: "" };
+  
+  const parts = [];
+  for (let i = 0; i < rawParts.length; i++) {
+    const part = rawParts[i];
+    if (parts.length > 0) {
+      const prev = parts[parts.length - 1];
+      const lastWord = prev.split(/\s+/).at(-1).toLowerCase().replace(/[^\p{L}]/gu, "");
+      if (/^(?:s|p|pp|ed|eds|vol|no|cev|trans|haz)$/.test(lastWord)) {
+        parts[parts.length - 1] = prev + " " + part;
+        continue;
+      }
+    }
+    parts.push(part);
+  }
+
   if (parts.length === 1) return { title: parts[0].replace(/[.]+$/g, ""), container: "" };
   return {
     title: parts[0].replace(/[.]+$/g, ""),
