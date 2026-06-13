@@ -99,7 +99,7 @@ function buildVerificationTarget(reference, query) {
     return { kind: "scholar", label: "Scholar", url: `https://scholar.google.com/scholar?q=${encodeURIComponent(query)}` };
   }
   if (item.type === "book") {
-    return { kind: "books", label: "Google Books", url: `https://www.google.com/search?tbm=bks&q=${encodeURIComponent(query)}` };
+    return { kind: "google", label: "Google", url: `https://www.google.com/search?q=${encodeURIComponent(query)}` };
   }
   return { kind: "scholar", label: "Scholar", url: `https://scholar.google.com/scholar?q=${encodeURIComponent(query)}` };
 }
