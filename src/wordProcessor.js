@@ -377,7 +377,10 @@ export async function analyzePdf(file) {
       continue;
     }
     
-    const isContinuation = line.minX > baseMargin + 5;
+    const cleanText = line.text.trim();
+    const startsWithUrl = /^https?:\/\//i.test(cleanText);
+    const startsWithAccessDate = /^\((?:Erişim|Access|Accessed)/i.test(cleanText);
+    const isContinuation = (line.minX > baseMargin + 5) || startsWithUrl || startsWithAccessDate;
     if (isContinuation) {
       if (currentBib.text.endsWith("-")) {
         currentBib.text = currentBib.text.slice(0, -1) + line.text;
