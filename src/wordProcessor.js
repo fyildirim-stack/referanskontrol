@@ -46,14 +46,33 @@ export async function analyzeDocx(file) {
   // Process footnotes
   const footnotes = await extractFootnotes(zip);
   const footnoteCitations = findFootnoteCitations(footnotes, references);
-  const missingFootnoteCitations = footnoteCitations.filter(
-    (fc) => fc.keys.length > 0 && !fc.keys.some((key) => referenceKeys.has(key))
-  );
-  const unresolvedFootnoteCitations = footnoteCitations.filter((fc) => fc.keys.length === 0);
-  const missingFootnoteUnique = groupMissingCitations(
-    missingFootnoteCitations.flatMap((fc) => ({
-      display: fc.text,
+  
+  // Flatten the footnote citations into individual parts to verify each citation independently
+  const footnoteParts = footnoteCitations.flatMap((fc) => {
+    if (fc.parts && fc.parts.length > 0) {
+      return fc.parts.map((part) => ({
+        id: fc.id,
+        text: part.text,
+        kind: part.kind,
+        keys: part.keys,
+      }));
+    }
+    return [{
+      id: fc.id,
+      text: fc.text,
+      kind: fc.kind,
       keys: fc.keys,
+    }];
+  });
+
+  const missingFootnoteCitations = footnoteParts.filter(
+    (fp) => fp.keys.length > 0 && !fp.keys.some((key) => referenceKeys.has(key))
+  );
+  const unresolvedFootnoteCitations = footnoteParts.filter((fp) => fp.keys.length === 0);
+  const missingFootnoteUnique = groupMissingCitations(
+    missingFootnoteCitations.flatMap((fp) => ({
+      display: fp.text,
+      keys: fp.keys,
       paragraphIndex: 0,
       kind: "footnote",
     }))

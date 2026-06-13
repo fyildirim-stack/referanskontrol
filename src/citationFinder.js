@@ -24,6 +24,8 @@ export function findCitations(text, paragraphIndex) {
   }
 
   for (const match of text.matchAll(narrative)) {
+    const authorPart = match[1];
+    if (!isPlausibleCitationAuthorPart(authorPart)) continue;
     const rangeStart = match.index + match[1].length;
     const rangeEnd = match.index + match[0].length;
     if (occupied.some(([start, end]) => rangeStart >= start && rangeStart < end)) continue;
@@ -60,14 +62,33 @@ export function parseCitationPart(part) {
   return { keys: authors.map((author) => makeKey(author, yearMatch[1])) };
 }
 
+function foldTurkish(str) {
+  return str
+    .replace(/[ıİ]/g, "i")
+    .replace(/[ğĞ]/g, "g")
+    .replace(/[üÜ]/g, "u")
+    .replace(/[şŞ]/g, "s")
+    .replace(/[öÖ]/g, "o")
+    .replace(/[çÇ]/g, "c")
+    .toLowerCase();
+}
+
 export function extractCitationAuthors(authorPart) {
   const cleaned = authorPart.replace(/\b(?:et al|vd)\.?/giu, "").replace(/\s+/g, " ");
-  return cleaned.split(/\s*(?:,?\s*&\s*|,?\s+and\s+|,?\s+ve\s+|,)\s*/iu).map(cleanAuthor).filter(Boolean);
+  return cleaned.split(/\s*(?:,?\s*&\s*|,?\s+and\s+|,?\s+ve\s+|,|[\u2013\u2014]|\s+-\s*|\s*-\s+)\s*/iu).map(cleanAuthor).filter(Boolean);
 }
 
 export function isPlausibleCitationAuthorPart(authorPart) {
   const cleaned = authorPart.replace(/\b(?:et al|vd)\.?/giu, "").trim();
   if (!cleaned || /\d/.test(cleaned)) return false;
+  
+  const folded = foldTurkish(cleaned);
+  const FORBIDDEN_KEYWORDS = /\b(?:yayin|press|publisher|edition|editor|cev|trans|tezi|tez|dissertation|universite|enstitu|dergi|journal|cilt|vol|sayi|issue|no|ocak|subat|mart|nisan|mayis|haziran|temmuz|agustos|eylul|ekim|kasim|aralik|january|february|march|april|may|june|july|august|september|october|november|december|erisim|accessed|access|url|web|http|https|www|istanbul|ankara|bursa|izmir|konya|erzurum|kayseri|sivas|london|new\s+york|chicago|boston|oxford|cambridge)\b/i;
+  if (FORBIDDEN_KEYWORDS.test(folded)) return false;
+
+  const hasCityPublisher = /[\p{L}]:\s*\p{L}/u.test(cleaned);
+  if (hasCityPublisher) return false;
+
   return /^\p{Lu}/u.test(cleaned) || /^[A-Z&.\s-]{2,}$/u.test(cleaned);
 }
 

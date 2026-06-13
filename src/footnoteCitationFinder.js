@@ -3,113 +3,160 @@ import { extractReferenceAuthors, extractReferenceAliases, findYearInReference, 
 
 const REPEAT_PATTERNS = /^(a\.g\.e\.|a\.g\.m\.|ibid|op\.\s*cit\.|loc\.\s*cit\.)/i;
 
+function splitBySemicolonOutsideQuotes(text) {
+  const parts = [];
+  let current = "";
+  let inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    if (/[“"«»”]/.test(char)) {
+      inQuotes = !inQuotes;
+    }
+    if (char === ';' && !inQuotes) {
+      parts.push(current);
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+  if (current) {
+    parts.push(current);
+  }
+  return parts.map(p => p.trim()).filter(Boolean);
+}
+
 export function findFootnoteCitations(footnotes, references = []) {
   const result = [];
   const resolved = new Map();
+  const resolvedHistory = [];
 
   footnotes.forEach((footnote) => {
-    const citation = resolveFootnoteCitation(footnote, resolved, references);
+    const partTexts = splitBySemicolonOutsideQuotes(footnote.text);
+    const resolvedParts = [];
+    const footnoteKeys = [];
+
+    partTexts.forEach((partText) => {
+      const partRes = resolveFootnotePart(partText, resolvedHistory, references);
+      resolvedParts.push(partRes);
+      if (partRes.keys && partRes.keys.length > 0) {
+        footnoteKeys.push(...partRes.keys);
+        resolvedHistory.push({ id: footnote.id, keys: partRes.keys });
+      }
+    });
+
+    const uniqueKeys = [...new Set(footnoteKeys)];
+
+    let kind = "footnote-unresolved";
+    if (resolvedParts.length > 0) {
+      const resolvedPart = resolvedParts.find(p => p.kind !== "footnote-unresolved");
+      if (resolvedPart) {
+        kind = resolvedPart.kind;
+      } else {
+        kind = resolvedParts[0].kind;
+      }
+    }
+
+    const citation = {
+      id: footnote.id,
+      text: footnote.text,
+      kind,
+      keys: uniqueKeys,
+      parts: resolvedParts
+    };
+
+    const resolvedFromPart = resolvedParts.find(p => p.resolvedFrom);
+    if (resolvedFromPart) {
+      citation.resolvedFrom = resolvedFromPart.resolvedFrom;
+    }
+
     result.push(citation);
-    if (citation.keys && citation.keys.length > 0) {
-      resolved.set(footnote.id, citation.keys);
+    if (uniqueKeys.length > 0) {
+      resolved.set(footnote.id, uniqueKeys);
     }
   });
 
   return result;
 }
 
-function resolveFootnoteCitation(footnote, resolved, references) {
-  const base = {
-    id: footnote.id,
-    text: footnote.text,
-    kind: "footnote-unresolved",
-    keys: [],
-  };
-
+function resolveFootnotePart(partText, resolvedHistory, references) {
   // 1. Try inline or narrative APA citation match (e.g. Smith (2020))
-  const inlineCitations = findCitations(footnote.text, 0);
-  if (inlineCitations.length > 0) {
-    const keys = inlineCitations.flatMap((c) => c.keys).filter(Boolean);
-    if (keys.length > 0) {
-      return {
-        ...base,
-        kind: "footnote-inline",
-        keys: [...new Set(keys)],
-      };
-    }
-  }
-
-  // Split footnote by semicolon in case it contains multiple citations
-  const parts = footnote.text.split(';').map(p => p.trim()).filter(Boolean);
-  const allKeys = [];
-  let kind = "footnote-unresolved";
-
-  for (const part of parts) {
-    // 2. Try parenthetical or inline citation match
-    const yearMatch = findYearInReference(part);
-    if (yearMatch && yearMatch.index < 280) {
-      const authorSegment = getActualAuthorSegment(part, yearMatch);
-      if (authorSegment && /[\p{L}]/u.test(authorSegment)) {
-        const authors = extractReferenceAuthors(authorSegment);
-        if (authors.length > 0) {
-          const year = yearMatch[1];
-          const aliases = extractReferenceAliases(authorSegment, year);
-          const keys = [...new Set([...authors.map((author) => makeKey(author, year)), ...aliases])];
-          allKeys.push(...keys);
-          kind = "footnote-fulltext";
-          continue;
-        }
-      }
-    }
-
-    // 3. Try shortened citation match
-    const shortened = resolveShortenedFootnote(part, references);
-    if (shortened) {
-      allKeys.push(...shortened.keys);
-      kind = shortened.kind;
-      continue;
-    }
-  }
-
-  if (allKeys.length > 0) {
-    return {
-      ...base,
-      kind,
-      keys: [...new Set(allKeys)],
-    };
-  }
-
-  // 4. Try repeat pattern
-  const repeatMatch = REPEAT_PATTERNS.exec(footnote.text);
-  if (repeatMatch) {
-    const allIds = Array.from(resolved.keys());
-    if (allIds.length > 0) {
-      const lastId = allIds[allIds.length - 1];
-      const inheritedKeys = resolved.get(lastId);
-      if (inheritedKeys && inheritedKeys.length > 0) {
+  const hasQuotes = /[“"‘«'”’»]/.test(partText);
+  if (!hasQuotes) {
+    const inlineCitations = findCitations(partText, 0);
+    if (inlineCitations.length > 0) {
+      const keys = inlineCitations.flatMap((c) => c.keys).filter(Boolean);
+      if (keys.length > 0) {
         return {
-          ...base,
-          kind: "footnote-repeat",
-          keys: inheritedKeys,
-          resolvedFrom: lastId,
+          text: partText,
+          kind: "footnote-inline",
+          keys: [...new Set(keys)],
         };
       }
     }
   }
 
-  return base;
+  // 2. Try parenthetical or inline citation match (full text)
+  const yearMatch = findYearInReference(partText);
+  if (yearMatch && yearMatch.index < 280) {
+    const authorSegment = getActualAuthorSegment(partText, yearMatch);
+    if (authorSegment && /[\p{L}]/u.test(authorSegment)) {
+      const authors = extractReferenceAuthors(authorSegment);
+      if (authors.length > 0) {
+        const year = yearMatch[1];
+        const aliases = extractReferenceAliases(authorSegment, year);
+        const keys = [...new Set([...authors.map((author) => makeKey(author, year)), ...aliases])];
+        return {
+          text: partText,
+          kind: "footnote-fulltext",
+          keys,
+        };
+      }
+    }
+  }
+
+  // 3. Try shortened citation match
+  const shortened = resolveShortenedFootnote(partText, references);
+  if (shortened) {
+    return {
+      text: partText,
+      kind: shortened.kind,
+      keys: shortened.keys,
+    };
+  }
+
+  // 4. Try repeat pattern
+  const repeatMatch = REPEAT_PATTERNS.exec(partText);
+  if (repeatMatch) {
+    if (resolvedHistory.length > 0) {
+      const lastEntry = resolvedHistory[resolvedHistory.length - 1];
+      if (lastEntry && lastEntry.keys && lastEntry.keys.length > 0) {
+        return {
+          text: partText,
+          kind: "footnote-repeat",
+          keys: lastEntry.keys,
+          resolvedFrom: lastEntry.id,
+        };
+      }
+    }
+  }
+
+  return {
+    text: partText,
+    kind: "footnote-unresolved",
+    keys: [],
+  };
 }
 
 // Custom Turkish Folding
 function foldTurkish(str) {
   return str
-    .toLowerCase()
     .replace(/[ıİ]/g, "i")
     .replace(/[ğĞ]/g, "g")
     .replace(/[üÜ]/g, "u")
     .replace(/[şŞ]/g, "s")
     .replace(/[öÖ]/g, "o")
-    .replace(/[çÇ]/g, "c");
+    .replace(/[çÇ]/g, "c")
+    .toLowerCase();
 }
 
 function cleanWithSpaces(str) {

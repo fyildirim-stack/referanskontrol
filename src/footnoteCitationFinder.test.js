@@ -168,5 +168,28 @@ describe("Footnote Citation Finder Tests", () => {
     const result = findFootnoteCitations(footnotes, references);
     expect(result[0].keys).toContain("barthold:1973");
     expect(result[0].keys).toContain("hodgson:1995");
+    expect(result[0].parts).toHaveLength(2);
+    expect(result[0].parts[0].keys).toContain("barthold:1973");
+    expect(result[0].parts[1].keys).toContain("hodgson:1995");
+  });
+
+  it("should support multiple authors separated by hyphens/dashes in footnotes", () => {
+    const references = [
+      {
+        keys: ["digler:2008"],
+        structured: {
+          title: "Hüsn-i Hat ve Mimarimizdeki Yeri",
+          authors: [
+            { family: "Diğler", given: "Mustafa", full: "Mustafa Diğler" },
+            { family: "Aydın", given: "Seçkin", full: "Seçkin Aydın" }
+          ]
+        }
+      }
+    ];
+    const footnotes = [
+      { id: "1", text: "Mustafa Diğler- Seçkin Aydın, “Hüsn-i Hat ve Mimarimizdeki Yeri”, 2008." }
+    ];
+    const result = findFootnoteCitations(footnotes, references);
+    expect(result[0].keys).toContain("digler:2008");
   });
 });

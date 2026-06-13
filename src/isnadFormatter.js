@@ -211,7 +211,7 @@ export function splitTitleAndContainer(text) {
 
 export function parseAuthorNames(authorSegment) {
   return authorSegment
-    .split(/\s*(?:,\s*&|,\s*\band\b|\bve\b)\s*/iu)
+    .split(/\s*(?:,?\s*&\s*|,?\s+and\s+|,?\s+ve\s+|,|[\u2013\u2014]|\s+-\s*|\s*-\s+)\s*/iu)
     .flatMap((part) => part.split(/\s*,\s*(?=[\p{Lu}][\p{L}'-]+\s*,)/u))
     .map((part) => part.trim().replace(/[.]+$/g, ""))
     .filter(Boolean)
@@ -245,7 +245,7 @@ export function inferReferenceType(container, url, doi) {
 
 export function extractReferenceAuthors(authorSegment) {
   return authorSegment
-    .split(/\s*(?:,\s*&|,\s*\band\b|\bve\b)\s*/iu)
+    .split(/\s*(?:,?\s*&\s*|,?\s+and\s+|,?\s+ve\s+|,|[\u2013\u2014]|\s+-\s*|\s*-\s+)\s*/iu)
     .flatMap((part) => part.split(/\s*,\s*(?=[\p{Lu}][\p{L}'-]+\s*,)/u))
     .map((part) => part.split(",")[0].replace(/[()]/g, "").replace(/\b(?:et al|vd)\.?/giu, "").replace(/[^\p{L}'-]/gu, " ").trim().split(/\s+/).at(-1) || "")
     .filter(Boolean);
