@@ -4,14 +4,148 @@ export function referenceYearRegex() {
   return /\(((?:19|20)\d{2}[a-z]?|n\.d\.|t\.y\.)(?:[^)]*)\)/i;
 }
 
+export function findYearInReference(text) {
+  // 1. Try parenthesized year, e.g. (2020) or (Aralık 2020) or (t.y.)
+  const parenRegex = /\((?:[^)]*?\s+)?((?:19|20)\d{2}[a-z]?|t\.y\.|n\.d\.)[^)]*?\)/i;
+  const parenMatch = text.match(parenRegex);
+  if (parenMatch) {
+    const res = [parenMatch[0], parenMatch[1]];
+    res.index = parenMatch.index;
+    return res;
+  }
+
+  // 2. Try to find a year near the end of the citation (excluding URLs or access dates)
+  const cleanText = text
+    .replace(/https?:\/\/\S+/gi, "")
+    .replace(/(?:Erişim|Accessed)[\s:]*\d{1,2}[./-]\d{1,2}[./-]\d{2,4}/gi, "")
+    .replace(/(?:Erişim|Accessed)[\s:]*\d{1,2}\s+\p{L}+\s+\d{2,4}/giu, "");
+
+  const yearRegex = /\b((?:19|20)\d{2}[a-z]?|t\.y\.|n\.d\.)\b/gi;
+  let lastMatch = null;
+  let match;
+  while ((match = yearRegex.exec(cleanText)) !== null) {
+    lastMatch = {
+      year: match[1],
+      matchText: match[0],
+      index: match.index
+    };
+  }
+  if (lastMatch) {
+    const originalIndex = text.indexOf(lastMatch.year);
+    if (originalIndex !== -1) {
+      const res = [lastMatch.matchText, lastMatch.year];
+      res.index = originalIndex;
+      return res;
+    }
+  }
+
+  // 3. Fallback: search for any year in the text
+  const fallbackRegex = /\b((?:19|20)\d{2}[a-z]?|t\.y\.|n\.d\.)\b/i;
+  const fallbackMatch = text.match(fallbackRegex);
+  if (fallbackMatch) {
+    const res = [fallbackMatch[0], fallbackMatch[1]];
+    res.index = fallbackMatch.index;
+    return res;
+  }
+
+  return null;
+}
+
+export function getActualAuthorSegment(text, yearMatch) {
+  if (yearMatch && yearMatch.index < 120) {
+    return text.slice(0, yearMatch.index).trim();
+  }
+  
+  const quoteIndex = text.search(/[“"‘«]/);
+  if (quoteIndex !== -1 && quoteIndex < 150) {
+    return text.slice(0, quoteIndex).trim().replace(/[.,\s]+$/, "");
+  }
+  
+  const dotMatches = [...text.matchAll(/\.\s+/g)];
+  for (const match of dotMatches) {
+    const idx = match.index;
+    if (idx > 150) break;
+    const before = text.slice(0, idx).trim();
+    const lastWord = before.split(/\s+/).at(-1) || "";
+    if (lastWord.length === 1 && lastWord === lastWord.toUpperCase()) {
+      continue;
+    }
+    return before;
+  }
+  
+  return text.slice(0, 80).trim();
+}
+
 export function parseReference(text, paragraphIndex) {
-  const yearMatch = text.match(referenceYearRegex());
+  const yearMatch = findYearInReference(text);
   if (!yearMatch) return null;
-  const authorSegment = text.slice(0, yearMatch.index).trim();
-  const authors = extractReferenceAuthors(authorSegment);
+
+  const authorSegment = getActualAuthorSegment(text, yearMatch);
+  const authors = parseAuthorNames(authorSegment);
   if (!authors.length) return null;
-  const keys = [...new Set([...authors.map((author) => makeKey(author, yearMatch[1])), ...extractReferenceAliases(authorSegment, yearMatch[1])])];
-  const structured = parseApaReference(text, authorSegment, yearMatch);
+
+  const year = yearMatch[1];
+  const dateText = yearMatch[0].replace(/[()]/g, "");
+
+  let title = "";
+  let container = "";
+
+  const quoteRegex = /[“"‘«']([^”"’»']+)[”"’»']/;
+  const quoteMatch = text.match(quoteRegex);
+  if (quoteMatch) {
+    title = quoteMatch[1].trim();
+    const afterQuote = text.slice(quoteMatch.index + quoteMatch[0].length).trim();
+    container = afterQuote
+      .replace(yearMatch[0], "")
+      .replace(/https?:\/\/\S+/gi, "")
+      .replace(/(?:Erişim|Accessed)[\s:]*\d{1,2}[./-]\d{1,2}[./-]\d{2,4}/gi, "")
+      .replace(/(?:Erişim|Accessed)[\s:]*\d{1,2}\s+\p{L}+\s+\d{2,4}/giu, "")
+      .replace(/[.,\s]+$/, "")
+      .trim();
+  } else {
+    if (yearMatch.index < 120) {
+      const afterDate = String(text.slice(yearMatch.index + yearMatch[0].length)).replace(/[ \t\r\n]+/g, " ").trim().replace(/^\.\s*/, "");
+      const withoutUrl = String(afterDate.replace(/https?:\/\/\S+/gi, "")).replace(/[ \t\r\n]+/g, " ").trim().replace(/[.]+$/g, "");
+      const titleSplit = splitTitleAndContainer(withoutUrl);
+      title = titleSplit.title;
+      container = titleSplit.container;
+    } else {
+      const afterAuthor = text.slice(authorSegment.length).trim().replace(/^\.\s*/, "");
+      const cleanAfterAuthor = afterAuthor.replace(yearMatch[0], "").trim().replace(/[.,\s]+$/, "");
+      const parts = cleanAfterAuthor.split(/\.\s+/);
+      if (parts.length > 0) {
+        title = parts[0].trim();
+        container = parts.slice(1).join(". ").trim();
+      } else {
+        title = cleanAfterAuthor;
+      }
+    }
+  }
+
+  title = title.replace(/^[.,\s“"‘«]+|[.,\s”"’»]+$/g, "").trim();
+  container = container.replace(/^[.,\s]+|[.,\s]+$/g, "").trim();
+
+  const url = text.match(/https?:\/\/\S+/i)?.[0]?.replace(/[).,]+$/g, "") || "";
+  const doi = text.match(/https?:\/\/doi\.org\/\S+/i)?.[0]?.replace(/[).,]+$/g, "") || "";
+  const type = (doi || /\b\d+\s*\(\d+\)|\b\d+\/\d+|\bjournal|dergi|policy|reviews?|energy policy\b/i.test(container)) ? "article" : (url ? "web" : "book");
+
+  const structured = {
+    raw: text,
+    authors,
+    authorText: authors.map((author) => author.full).join(" - ") || authorSegment,
+    bibliographyAuthorText: formatBibliographyAuthors(authors, authorSegment),
+    year,
+    dateText,
+    title,
+    container,
+    url,
+    doi,
+    type,
+  };
+
+  const authorKeys = extractReferenceAuthors(authorSegment);
+  const keys = [...new Set([...authorKeys.map((author) => makeKey(author, year)), ...extractReferenceAliases(authorSegment, year)])];
+
   return {
     display: text,
     paragraphIndex,

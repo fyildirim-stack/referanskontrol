@@ -24,7 +24,8 @@ import {
   parseReference,
   buildIsnadBibliography,
   formatIsnadFootnote,
-  referenceYearRegex
+  findYearInReference,
+  getActualAuthorSegment
 } from "./isnadFormatter.js";
 
 export async function analyzeDocx(file) {
@@ -44,7 +45,7 @@ export async function analyzeDocx(file) {
 
   // Process footnotes
   const footnotes = await extractFootnotes(zip);
-  const footnoteCitations = findFootnoteCitations(footnotes);
+  const footnoteCitations = findFootnoteCitations(footnotes, references);
   const missingFootnoteCitations = footnoteCitations.filter(
     (fc) => fc.keys.length > 0 && !fc.keys.some((key) => referenceKeys.has(key))
   );
@@ -150,48 +151,17 @@ function buildReferenceEntries(referenceParagraphs) {
 }
 
 function splitReferenceParagraph(text) {
-  const lines = String(text)
+  return String(text)
     .split(/\n+/)
     .map((line) => normalizeVisibleText(line))
     .filter(Boolean);
-
-  if (lines.length > 1) return lines;
-
-  const single = lines[0] || "";
-  const starts = [...single.matchAll(referenceStartGlobalRegex())]
-    .map((match) => match.index)
-    .filter((index) => isInlineReferenceBoundary(single, index));
-  if (!starts.length) return single ? [single] : [];
-
-  const chunks = [];
-  let cursor = 0;
-  starts.forEach((start) => {
-    chunks.push(single.slice(cursor, start).trim());
-    cursor = start;
-  });
-  chunks.push(single.slice(cursor).trim());
-  return chunks.filter(Boolean);
-}
-
-function referenceStartGlobalRegex() {
-  const authorStart = String.raw`(?:\p{Lu}[\p{L}'-]{1,}|\p{Lu}[\p{L}'-]{1,}\s*,\s*\p{Lu}\.|\p{Lu}[\p{L}'-]{1,}\s+ve\s+\p{Lu}[\p{L}'-]{1,})`;
-  const yearStart = String.raw`\((?:(?:19|20)\d{2}[a-z]?|n\.d\.|t\.y\.)(?:[^)]*)\)`;
-  return new RegExp(String.raw`(?=${authorStart}.{0,220}?${yearStart})`, "gu");
-}
-
-function isInlineReferenceBoundary(text, index) {
-  if (index <= 0 || !/^\p{Lu}/u.test(text.slice(index))) return false;
-  if (!/\s/.test(text[index - 1] || "")) return false;
-  const before = text.slice(0, index).trimEnd();
-  if (!before) return false;
-  return /[.!?)]$/.test(before) || /(?:https?:\/\/|www\.)\S+$/i.test(before);
 }
 
 function isReferenceStart(text) {
   const candidate = normalizeVisibleText(text).replace(/^\s*\[\d+\]\s*/, "");
-  const yearMatch = candidate.match(referenceYearRegex());
+  const yearMatch = findYearInReference(candidate);
   if (!yearMatch || yearMatch.index > 260) return false;
-  const authorSegment = candidate.slice(0, yearMatch.index).trim();
+  const authorSegment = getActualAuthorSegment(candidate, yearMatch);
   return /[\p{L}]/u.test(authorSegment) && authorSegment.length >= 2;
 }
 

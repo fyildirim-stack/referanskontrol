@@ -108,4 +108,22 @@ describe("Footnote Citation Finder Tests", () => {
     expect(result[0].kind).toBe("footnote-inline");
     expect(result[1].kind).toBe("footnote-inline");
   });
+
+  it("should resolve shortened footnote citation using references list", () => {
+    const references = [
+      {
+        keys: ["yazıcı:2012"],
+        structured: {
+          title: "Bir Eğitim-Öğretim Kurumu Olarak Cami",
+          authors: [{ family: "Yazıcı", given: "Nesimi", full: "Nesimi Yazıcı" }]
+        }
+      }
+    ];
+    const footnotes = [
+      { id: "1", text: "Nesimi Yazıcı, “Bir Eğitim-Öğretim Kurumu Olarak Cami”" }
+    ];
+    const result = findFootnoteCitations(footnotes, references);
+    expect(result[0].kind).toBe("footnote-shortened");
+    expect(result[0].keys).toContain("yazıcı:2012");
+  });
 });
