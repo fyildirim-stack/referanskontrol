@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { findCitations, looksLikeCitation, makeKey } from "./citationFinder.js";
 import { parseReference, formatIsnadFootnote, formatIsnadBibliography } from "./isnadFormatter.js";
+import { analyzePdf } from "./wordProcessor.js";
 
 describe("Citation Finder Tests", () => {
   it("should detect looksLikeCitation correctly", () => {
@@ -61,5 +62,11 @@ describe("ISNAD Formatter Tests", () => {
     };
     const bib = formatIsnadBibliography(structured);
     expect(bib).toBe("Smith, J. - A. Doe. Modern Web Development. Publishing Press. 2020.");
+  });
+});
+
+describe("PDF Analysis Tests", () => {
+  it("should export analyzePdf function", () => {
+    expect(typeof analyzePdf).toBe("function");
   });
 });

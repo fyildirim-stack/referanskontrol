@@ -1,5 +1,6 @@
 import JSZip from "jszip";
 import { buildVerificationRecords } from "./zoteroExport.js";
+import { extractTextFromPdf } from "./pdfParser.js";
 import {
   readZipText,
   parseXml,
@@ -198,4 +199,227 @@ function formatCitationFootnote(citation, referenceByKey) {
   const reference = citation.keys.map((key) => referenceByKey.get(key)).find(Boolean);
   if (!reference) return `${citation.display}.`;
   return reference.isnadFootnote || formatIsnadFootnote(reference.structured);
+}
+
+function convertSuperscriptToNormal(str) {
+  const mapping = {
+    "¹": "1", "²": "2", "³": "3", "⁴": "4", "⁵": "5",
+    "⁶": "6", "⁷": "7", "⁸": "8", "⁹": "9", "⁰": "0"
+  };
+  return str.split("").map(c => mapping[c] || c).join("");
+}
+
+function resolveShortenedFootnoteCheck(partText, references) {
+  if (!references || !references.length) return false;
+  const quoteRegex = /[“"‘«']([^”"’»']+)[”"’»']/;
+  const quoteMatch = partText.match(quoteRegex);
+  
+  const cleanPart = partText
+    .replace(/[ıİ]/g, "i")
+    .replace(/[ğĞ]/g, "g")
+    .replace(/[üÜ]/g, "u")
+    .replace(/[şŞ]/g, "s")
+    .replace(/[öÖ]/g, "o")
+    .replace(/[çÇ]/g, "c")
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const partWords = cleanPart.split(' ');
+
+  for (const ref of references) {
+    const authors = ref.structured?.authors || [];
+    if (!authors.length) continue;
+    const authorMatches = authors.some((author) => {
+      const familyName = typeof author === "string" ? author : author.family;
+      if (!familyName) return false;
+      const cleanFamily = familyName
+        .replace(/[ıİ]/g, "i")
+        .replace(/[ğĞ]/g, "g")
+        .replace(/[üÜ]/g, "u")
+        .replace(/[şŞ]/g, "s")
+        .replace(/[öÖ]/g, "o")
+        .replace(/[çÇ]/g, "c")
+        .toLowerCase()
+        .replace(/[^\p{L}\p{N}\s]/gu, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+      return partWords.includes(cleanFamily);
+    });
+    if (!authorMatches) continue;
+    const title = ref.structured?.title || "";
+    if (!title) continue;
+    const cleanTitle = title
+      .replace(/[ıİ]/g, "i")
+      .replace(/[ğĞ]/g, "g")
+      .replace(/[üÜ]/g, "u")
+      .replace(/[şŞ]/g, "s")
+      .replace(/[öÖ]/g, "o")
+      .replace(/[çÇ]/g, "c")
+      .toLowerCase()
+      .replace(/[^\p{L}\p{N}\s]/gu, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (quoteMatch) {
+      const quoted = quoteMatch[1]
+        .replace(/[ıİ]/g, "i")
+        .replace(/[ğĞ]/g, "g")
+        .replace(/[üÜ]/g, "u")
+        .replace(/[şŞ]/g, "s")
+        .replace(/[öÖ]/g, "o")
+        .replace(/[çÇ]/g, "c")
+        .toLowerCase()
+        .replace(/[^\p{L}\p{N}\s]/gu, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+      if (cleanTitle.includes(quoted) || quoted.includes(cleanTitle)) {
+        return true;
+      }
+    }
+    if (cleanPart.includes(cleanTitle)) {
+      return true;
+    }
+    const titleWords = cleanTitle.split(' ').filter(w => w.length > 2);
+    if (titleWords.length > 0) {
+      const matchingWords = titleWords.filter(w => partWords.includes(w));
+      const score = matchingWords.length / titleWords.length;
+      const firstTitleWord = cleanTitle.split(' ')[0];
+      const firstWordMatches = firstTitleWord && firstTitleWord.length > 2 && partWords.includes(firstTitleWord);
+      if (score >= 0.3 || firstWordMatches) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function looksLikeFootnote(text, references) {
+  const clean = text.trim();
+  if (/a\.g\.e\.|a\.g\.m\.|ibid|op\.\s*cit\.|loc\.\s*cit\./i.test(clean)) return true;
+  if (/[“"‘«'”’»]/.test(clean)) return true;
+  if (/\b(?:19|20)\d{2}[a-z]?\b/i.test(clean) || /\b(?:n\.d\.|t\.y\.|t\.s\.|ts\.)\b/i.test(clean)) return true;
+  if (resolveShortenedFootnoteCheck(clean, references)) return true;
+  return false;
+}
+
+export async function analyzePdf(file) {
+  const pages = await extractTextFromPdf(file);
+  const paragraphs = [];
+  let index = 0;
+
+  pages.forEach((page) => {
+    page.lines.forEach((line) => {
+      if (line.trim().length > 3) {
+        paragraphs.push({
+          index: index++,
+          text: line.trim(),
+          pageNumber: page.pageNumber,
+        });
+      }
+    });
+  });
+  
+  const referencesStart = findReferencesStartRobust(paragraphs);
+  const bodyParagraphs = referencesStart === -1 ? paragraphs : paragraphs.slice(0, referencesStart);
+  const referenceParagraphs = referencesStart === -1 ? [] : paragraphs.slice(referencesStart + 1);
+
+  // In-text citations
+  const citations = bodyParagraphs.flatMap((paragraph) => {
+    const found = findCitations(paragraph.text, paragraph.index);
+    return found.map(c => ({
+      ...c,
+      pageNumber: paragraph.pageNumber,
+    }));
+  });
+
+  // Bibliography references
+  const referenceEntries = buildReferenceEntries(referenceParagraphs);
+  const references = referenceEntries.map((entry) => parseReference(entry.text, entry.paragraphIndex)).filter(Boolean);
+  const referenceKeys = new Set(references.flatMap((reference) => reference.keys));
+  const missing = citations.filter((citation) => !citation.keys.some((key) => referenceKeys.has(key)));
+  const missingUnique = groupMissingCitations(missing);
+
+  // Extract footnotes from PDF body
+  const footnotes = [];
+  let footnoteIdCounter = 1;
+
+  bodyParagraphs.forEach((paragraph) => {
+    const match = /^\s*([¹²³⁴⁵⁶⁷⁸⁹⁰\d]+)\s*[\.\s-]*\s*([\p{L}].*)$/u.exec(paragraph.text);
+    if (match) {
+      const numStr = convertSuperscriptToNormal(match[1]);
+      const footnoteId = parseInt(numStr, 10);
+      const footnoteText = match[2].trim();
+
+      if (looksLikeFootnote(footnoteText, references)) {
+        footnotes.push({
+          id: isNaN(footnoteId) ? footnoteIdCounter++ : footnoteId,
+          text: footnoteText,
+          pageNumber: paragraph.pageNumber,
+        });
+      }
+    }
+  });
+
+  footnotes.sort((a, b) => a.pageNumber - b.pageNumber || a.id - b.id);
+
+  const footnoteCitations = findFootnoteCitations(footnotes, references);
+  
+  const footnoteParts = footnoteCitations.flatMap((fc) => {
+    if (fc.parts && fc.parts.length > 0) {
+      return fc.parts.map((part) => ({
+        id: fc.id,
+        text: part.text,
+        kind: part.kind,
+        keys: part.keys,
+        pageNumber: fc.pageNumber || 0,
+      }));
+    }
+    return [{
+      id: fc.id,
+      text: fc.text,
+      kind: fc.kind,
+      keys: fc.keys,
+      pageNumber: fc.pageNumber || 0,
+    }];
+  });
+
+  const missingFootnoteCitations = footnoteParts.filter(
+    (fp) => fp.keys.length > 0 && !fp.keys.some((key) => referenceKeys.has(key))
+  );
+  const unresolvedFootnoteCitations = footnoteParts.filter((fp) => fp.keys.length === 0);
+  
+  const missingFootnoteUnique = groupMissingCitations(
+    missingFootnoteCitations.flatMap((fp) => ({
+      display: fp.text,
+      keys: fp.keys,
+      paragraphIndex: 0,
+      kind: "footnote",
+      pageNumber: fp.pageNumber,
+    }))
+  );
+
+  const isnadBibliography = buildIsnadBibliography(references);
+  const verificationRecords = buildVerificationRecords(references);
+
+  return {
+    citations,
+    references,
+    missing,
+    missingUnique,
+    footnoteCitations,
+    missingFootnoteCitations,
+    missingFootnoteUnique,
+    unresolvedFootnoteCitations,
+    isnadBibliography,
+    verificationRecords,
+    referencesStart,
+    diagnostics: {
+      referencesHeadingFound: referencesStart !== -1,
+      referenceCandidateCount: referenceEntries.length,
+      unparsedReferenceCount: Math.max(0, referenceEntries.length - references.length),
+      footnoteCount: footnotes.length,
+      unresolvedFootnoteCount: unresolvedFootnoteCitations.length,
+    },
+    paragraphs: paragraphs.map(({ index, text, pageNumber }) => ({ index, text, pageNumber })),
+  };
 }

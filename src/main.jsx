@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { AlertTriangle, CheckCircle2, Download, ExternalLink, FileCheck2, FileJson, FileText, Search, UploadCloud } from "lucide-react";
-import { analyzeDocx, convertDocxToFootnotes } from "./wordProcessor.js";
+import { analyzeDocx, analyzePdf, convertDocxToFootnotes } from "./wordProcessor.js";
 import { exportBibtex, exportCslJson, exportRis } from "./zoteroExport.js";
 import "./styles.css";
 
@@ -43,6 +43,7 @@ function App() {
 
   async function handleFile(nextFile) {
     if (!nextFile) return;
+    const isPdf = nextFile.name.toLowerCase().endsWith(".pdf");
 
     if (isInText) {
       setInTextFile(nextFile);
@@ -53,7 +54,7 @@ function App() {
       setInTextError("");
 
       try {
-        const result = await analyzeDocx(nextFile);
+        const result = isPdf ? await analyzePdf(nextFile) : await analyzeDocx(nextFile);
         setInTextAnalysis(result);
         setInTextStatus("ready");
       } catch (err) {
@@ -68,7 +69,7 @@ function App() {
       setFootnoteError("");
 
       try {
-        const result = await analyzeDocx(nextFile);
+        const result = isPdf ? await analyzePdf(nextFile) : await analyzeDocx(nextFile);
         setFootnoteAnalysis(result);
         setFootnoteStatus("ready");
       } catch (err) {
@@ -204,9 +205,9 @@ function App() {
 
       <section className="workspace">
         <label className="dropzone">
-          <input type="file" accept=".docx" onChange={(event) => handleFile(event.target.files?.[0])} />
+          <input type="file" accept=".docx,.pdf" onChange={(event) => handleFile(event.target.files?.[0])} />
           <UploadCloud size={42} />
-          <strong>{fileName || "Word belgesini seçin"}</strong>
+          <strong>{fileName || "Word veya PDF belgesini seçin"}</strong>
           <span>
             {isInText
               ? "Kaynakça başlığı “Kaynakça”, “Kaynaklar” veya “References” olarak ayrılmış olmalı. Metin içi atıflar analiz edilecektir."
@@ -217,7 +218,7 @@ function App() {
         <div className="actions">
           {isInText ? (
             <>
-              <button type="button" onClick={handleConvert} disabled={!analysis || status === "converting"}>
+              <button type="button" onClick={handleConvert} disabled={!analysis || status === "converting" || !file?.name?.toLowerCase().endsWith(".docx")}>
                 <FileCheck2 size={18} />
                 Dipnotlu Word oluştur
               </button>
