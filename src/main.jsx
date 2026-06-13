@@ -127,7 +127,7 @@ function App() {
         <label className="dropzone">
           <input type="file" accept=".docx" onChange={(event) => handleFile(event.target.files?.[0])} />
           <UploadCloud size={42} />
-          <strong>{fileName || “Word belgesini seçin”}</strong>
+          <strong>{fileName || "Word belgesini seçin"}</strong>
           <span>Kaynakça başlığı “Kaynakça”, “Kaynaklar” veya “References” olarak ayrılmış olmalı. Metin içi ve dipnot atıfları analiz edilecektir.</span>
         </label>
 
