@@ -52,7 +52,7 @@ export function findYearInReference(text) {
 }
 
 export function getActualAuthorSegment(text, yearMatch) {
-  const isApasque = yearMatch && yearMatch[0] && yearMatch[0].startsWith("(") && yearMatch.index < 60;
+  const isApasque = yearMatch && yearMatch[0] && yearMatch[0].startsWith("(") && yearMatch.index < 250;
   if (isApasque) {
     return text.slice(0, yearMatch.index).trim();
   }
@@ -107,7 +107,7 @@ export function parseReference(text, paragraphIndex) {
 
   const quoteRegex = /[“"‘«']([^”"’»']+)[”"’»']/;
   const quoteMatch = text.match(quoteRegex);
-  const isApasque = yearMatch && yearMatch[0] && yearMatch[0].startsWith("(") && yearMatch.index < 60;
+  const isApasque = yearMatch && yearMatch[0] && yearMatch[0].startsWith("(") && yearMatch.index < 250;
 
   if (quoteMatch) {
     title = quoteMatch[1].trim();

@@ -83,7 +83,7 @@ export function isPlausibleCitationAuthorPart(authorPart) {
   if (!cleaned || /\d/.test(cleaned)) return false;
   
   const folded = foldTurkish(cleaned);
-  const FORBIDDEN_KEYWORDS = /\b(?:yayin|press|publisher|edition|editor|cev|trans|tezi|tez|dissertation|universite|enstitu|dergi|journal|cilt|vol|sayi|issue|no|ocak|subat|mart|nisan|mayis|haziran|temmuz|agustos|eylul|ekim|kasim|aralik|january|february|march|april|may|june|july|august|september|october|november|december|erisim|accessed|access|url|web|http|https|www|istanbul|ankara|bursa|izmir|konya|erzurum|kayseri|sivas|london|new\s+york|chicago|boston|oxford|cambridge)\b/i;
+  const FORBIDDEN_KEYWORDS = /\b(?:yayin|press|publisher|edition|editor|cev|trans|tezi|tez|dissertation|universite|enstitu|dergi|journal|cilt|vol|sayi|issue|no|ocak|subat|mart|nisan|mayis|haziran|temmuz|agustos|eylul|ekim|kasim|aralik|january|february|march|april|may|june|july|august|september|october|november|december|erisim|accessed|access|url|web|http|https|www|istanbul|ankara|bursa|izmir|konya|erzurum|kayseri|sivas|london|new\s+york|chicago|boston|oxford|cambridge|antlasmasi|antlasma|anlasmasi|anlasma|sozlesmesi|sozlesme|kanunu|kanun|yonetmeligi|yonetmelik|karari|karar|raporu|rapor|bildirgesi|bildirge|genelgesi|genelge|tuzugu|tuzuk|belgesi|belge|green\s+paper|white\s+paper|agreement|treaty|directive|regulation|protocol|declaration)\b/i;
   if (FORBIDDEN_KEYWORDS.test(folded)) return false;
 
   const hasCityPublisher = /[\p{L}]:\s*\p{L}/u.test(cleaned);
