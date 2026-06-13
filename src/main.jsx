@@ -15,6 +15,8 @@ function App() {
 
   const fileName = useMemo(() => file?.name ?? "", [file]);
   const uniqueMissing = analysis?.missingUnique ?? analysis?.missing ?? [];
+  const missingFootnoteUnique = analysis?.missingFootnoteUnique ?? [];
+  const unresolvedFootnote = analysis?.unresolvedFootnoteCitations ?? [];
   const verificationRecords = analysis?.verificationRecords ?? [];
   const approvedRecords = verificationRecords.filter((record) => approvedIds.has(record.id));
 
@@ -72,10 +74,19 @@ function App() {
       `Kaynakça girdisi: ${analysis.references.length}`,
       `Kaynakçada bulunmayan tekil kaynak: ${uniqueMissing.length}`,
       `Kaynakçada bulunmayan atıf geçişi: ${analysis.missing.length}`,
+      `Dipnot atfı: ${analysis.footnoteCitations?.length ?? 0}`,
+      `Kaynakçada bulunmayan tekil dipnot kaynağı: ${missingFootnoteUnique.length}`,
+      `Çözümlenemeyen dipnot: ${unresolvedFootnote.length}`,
       `Zotero için onaylanan kaynak: ${approvedRecords.length}`,
       "",
       "Kaynakçada bulunmayan tekil kaynaklar:",
       ...uniqueMissing.map((item) => `- ${item.display} | ${item.occurrences ?? 1} geçiş | paragraf ${formatParagraphs(item)}`),
+      "",
+      "Kaynakçada bulunmayan tekil dipnot kaynakları:",
+      ...missingFootnoteUnique.map((item) => `- ${item.display} | ${item.occurrences ?? 1} geçiş`),
+      "",
+      "Çözümlenemeyen dipnotlar:",
+      ...unresolvedFootnote.map((item) => `- Dipnot ${item.id}: ${item.text}`),
       "",
       "Kaynak doğrulama kayıtları:",
       ...verificationRecords.map((item) => `- ${item.title} | ${item.author} | ${item.year} | ${item.status}`),
@@ -106,18 +117,18 @@ function App() {
     <main className="shell">
       <section className="topbar">
         <div>
-          <h1>APA Dipnot Denetçisi</h1>
-          <p>Word belgesindeki APA atıflarını denetler, İSNAD dipnot/kaynakça çıktısı üretir ve kaynakları Scholar/Zotero akışına hazırlar.</p>
+          <h1>Referans Kontrol</h1>
+          <p>Word belgesindeki metin içi ve dipnot atıflarını kaynakçayla karşılaştırır. APA ve Chicago/İSNAD stillerinde işlem yapabilir, İSNAD dipnot/kaynakça çıktısı üretir.</p>
         </div>
-        <span className="privacy">v0.2.0</span>
+        <span className="privacy">v0.3.0</span>
       </section>
 
       <section className="workspace">
         <label className="dropzone">
           <input type="file" accept=".docx" onChange={(event) => handleFile(event.target.files?.[0])} />
           <UploadCloud size={42} />
-          <strong>{fileName || "DOCX makaleyi seçin"}</strong>
-          <span>Kaynakça başlığı “Kaynakça”, “Kaynaklar” veya “References” olarak ayrılmış olmalı.</span>
+          <strong>{fileName || “Word belgesini seçin”}</strong>
+          <span>Kaynakça başlığı “Kaynakça”, “Kaynaklar” veya “References” olarak ayrılmış olmalı. Metin içi ve dipnot atıfları analiz edilecektir.</span>
         </label>
 
         <div className="actions">
@@ -152,6 +163,8 @@ function App() {
           <Metric icon={<FileText />} label="Kaynakça girdisi" value={analysis.references.length} />
           <Metric icon={<FileJson />} label="Zotero kaydı" value={verificationRecords.length} />
           <Metric icon={uniqueMissing.length ? <AlertTriangle /> : <CheckCircle2 />} label="Tekil eksik kaynak" value={uniqueMissing.length} tone={uniqueMissing.length ? "warn" : "ok"} />
+          <Metric icon={<FileText />} label="Dipnot atfı" value={analysis.footnoteCitations?.length ?? 0} />
+          <Metric icon={missingFootnoteUnique.length ? <AlertTriangle /> : <CheckCircle2 />} label="Tekil eksik dipnot" value={missingFootnoteUnique.length} tone={missingFootnoteUnique.length ? "warn" : "ok"} />
         </section>
       )}
 
@@ -182,7 +195,7 @@ function App() {
               <article className="source-row" key={record.id}>
                 <label className="approve">
                   <input type="checkbox" checked={approvedIds.has(record.id)} onChange={() => toggleApproved(record.id)} />
-                  <span>Onayla</span>
+                  <span>✓ Onayla</span>
                 </label>
                 <div className="source-main">
                   <strong>{record.title}</strong>
@@ -224,12 +237,30 @@ function App() {
               </article>
             ))}
           </Panel>
+
+          <Panel title="Kaynakçada Yer Almayan Tekil Dipnot Kaynakları" empty="Tüm dipnot atıfları kaynakçada eşleşti.">
+            {missingFootnoteUnique.map((item) => (
+              <article className="row warn-row" key={`${item.keys?.join("-")}-${item.display}`}>
+                <strong>{item.display}</strong>
+                <span>{item.occurrences ?? 1} geçiş</span>
+              </article>
+            ))}
+          </Panel>
+
+          <Panel title="Çözümlenemeyen Dipnot Atıfları" empty="Tüm dipnot atıfları başarıyla çözümlendi.">
+            {unresolvedFootnote.map((item) => (
+              <article className="row warn-row" key={`footnote-${item.id}`}>
+                <strong>Dipnot {item.id}</strong>
+                <span className="unresolved-text">{item.text}</span>
+              </article>
+            ))}
+          </Panel>
         </section>
       )}
 
       <section className="note">
         <AlertTriangle size={18} />
-        <p>Google Scholar bağlantıları kullanıcı tetiklidir; otomatik kazıma yapılmaz. Zotero export dosyaları onaylanan kayıtları, hiç onay yoksa tüm ayrıştırılmış kaynakları içerir.</p>
+        <p>Google Scholar bağlantıları kullanıcı tetiklidir; otomatik kazıma yapılmaz. Zotero export dosyaları onaylanan kayıtları, hiç onay yoksa tüm ayrıştırılmış kaynakları içerir. Çözümlenemeyen dipnot atıfları manuel inceleme gerektirir.</p>
       </section>
     </main>
   );

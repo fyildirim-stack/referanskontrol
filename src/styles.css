@@ -159,7 +159,7 @@ button:disabled {
 
 .results {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 14px;
   margin: 20px 0;
 }
@@ -199,7 +199,7 @@ button:disabled {
 
 .columns {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 18px;
 }
 
@@ -358,6 +358,14 @@ button:disabled {
 .note svg {
   flex: 0 0 auto;
   margin-top: 2px;
+}
+
+.unresolved-text {
+  display: block;
+  font-size: 13px;
+  color: #6f7c86;
+  margin-top: 6px;
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 780px) {
