@@ -10,6 +10,28 @@ export async function readZipText(zip, path) {
   return file.async("text");
 }
 
+export async function extractFootnotes(zip) {
+  const footnoteFile = zip.file("word/footnotes.xml");
+  if (!footnoteFile) return [];
+
+  const footnoteXml = await footnoteFile.async("text");
+  const doc = parseXml(footnoteXml);
+  const footnotes = [];
+
+  Array.from(doc.getElementsByTagNameNS(WORD_NS, "footnote")).forEach((node) => {
+    const id = node.getAttributeNS(WORD_NS, "id");
+    if (id === "-1" || id === "0") return;
+
+    const text = getParagraphText(node, { preserveBreaks: true });
+    const normalized = normalizeVisibleText(text);
+    if (normalized) {
+      footnotes.push({ id, text: normalized });
+    }
+  });
+
+  return footnotes;
+}
+
 export function parseXml(xml) {
   const doc = new DOMParser().parseFromString(xml, "application/xml");
   const error = doc.getElementsByTagName("parsererror")[0];

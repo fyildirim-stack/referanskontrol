@@ -12,14 +12,14 @@ import {
   getNextFootnoteId,
   upsertFootnotes,
   ensureFootnoteRelationship,
-  ensureFootnoteContentType
+  ensureFootnoteContentType,
+  extractFootnotes
 } from "./docxParser.js";
 import {
   findCitations,
-  groupMissingCitations,
-  normalize,
-  cleanAuthor
+  groupMissingCitations
 } from "./citationFinder.js";
+import { findFootnoteCitations } from "./footnoteCitationFinder.js";
 import {
   parseReference,
   buildIsnadBibliography,
@@ -41,6 +41,23 @@ export async function analyzeDocx(file) {
   const referenceKeys = new Set(references.flatMap((reference) => reference.keys));
   const missing = citations.filter((citation) => !citation.keys.some((key) => referenceKeys.has(key)));
   const missingUnique = groupMissingCitations(missing);
+
+  // Process footnotes
+  const footnotes = await extractFootnotes(zip);
+  const footnoteCitations = findFootnoteCitations(footnotes);
+  const missingFootnoteCitations = footnoteCitations.filter(
+    (fc) => fc.keys.length > 0 && !fc.keys.some((key) => referenceKeys.has(key))
+  );
+  const unresolvedFootnoteCitations = footnoteCitations.filter((fc) => fc.keys.length === 0);
+  const missingFootnoteUnique = groupMissingCitations(
+    missingFootnoteCitations.flatMap((fc) => ({
+      display: fc.text,
+      keys: fc.keys,
+      paragraphIndex: 0,
+      kind: "footnote",
+    }))
+  );
+
   const isnadBibliography = buildIsnadBibliography(references);
   const verificationRecords = buildVerificationRecords(references);
 
@@ -49,6 +66,10 @@ export async function analyzeDocx(file) {
     references,
     missing,
     missingUnique,
+    footnoteCitations,
+    missingFootnoteCitations,
+    missingFootnoteUnique,
+    unresolvedFootnoteCitations,
     isnadBibliography,
     verificationRecords,
     referencesStart,
@@ -56,6 +77,8 @@ export async function analyzeDocx(file) {
       referencesHeadingFound: referencesStart !== -1,
       referenceCandidateCount: referenceEntries.length,
       unparsedReferenceCount: Math.max(0, referenceEntries.length - references.length),
+      footnoteCount: footnotes.length,
+      unresolvedFootnoteCount: unresolvedFootnoteCitations.length,
     },
     paragraphs: paragraphs.map(({ index, text }) => ({ index, text })),
   };

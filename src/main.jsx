@@ -15,6 +15,8 @@ function App() {
 
   const fileName = useMemo(() => file?.name ?? "", [file]);
   const uniqueMissing = analysis?.missingUnique ?? analysis?.missing ?? [];
+  const missingFootnoteUnique = analysis?.missingFootnoteUnique ?? [];
+  const unresolvedFootnote = analysis?.unresolvedFootnoteCitations ?? [];
   const verificationRecords = analysis?.verificationRecords ?? [];
   const approvedRecords = verificationRecords.filter((record) => approvedIds.has(record.id));
 
@@ -72,10 +74,19 @@ function App() {
       `Kaynakça girdisi: ${analysis.references.length}`,
       `Kaynakçada bulunmayan tekil kaynak: ${uniqueMissing.length}`,
       `Kaynakçada bulunmayan atıf geçişi: ${analysis.missing.length}`,
+      `Dipnot atfı: ${analysis.footnoteCitations?.length ?? 0}`,
+      `Kaynakçada bulunmayan tekil dipnot kaynağı: ${missingFootnoteUnique.length}`,
+      `Çözümlenemeyen dipnot: ${unresolvedFootnote.length}`,
       `Zotero için onaylanan kaynak: ${approvedRecords.length}`,
       "",
       "Kaynakçada bulunmayan tekil kaynaklar:",
       ...uniqueMissing.map((item) => `- ${item.display} | ${item.occurrences ?? 1} geçiş | paragraf ${formatParagraphs(item)}`),
+      "",
+      "Kaynakçada bulunmayan tekil dipnot kaynakları:",
+      ...missingFootnoteUnique.map((item) => `- ${item.display} | ${item.occurrences ?? 1} geçiş`),
+      "",
+      "Çözümlenemeyen dipnotlar:",
+      ...unresolvedFootnote.map((item) => `- Dipnot ${item.id}: ${item.text}`),
       "",
       "Kaynak doğrulama kayıtları:",
       ...verificationRecords.map((item) => `- ${item.title} | ${item.author} | ${item.year} | ${item.status}`),
@@ -152,6 +163,8 @@ function App() {
           <Metric icon={<FileText />} label="Kaynakça girdisi" value={analysis.references.length} />
           <Metric icon={<FileJson />} label="Zotero kaydı" value={verificationRecords.length} />
           <Metric icon={uniqueMissing.length ? <AlertTriangle /> : <CheckCircle2 />} label="Tekil eksik kaynak" value={uniqueMissing.length} tone={uniqueMissing.length ? "warn" : "ok"} />
+          <Metric icon={<FileText />} label="Dipnot atfı" value={analysis.footnoteCitations?.length ?? 0} />
+          <Metric icon={missingFootnoteUnique.length ? <AlertTriangle /> : <CheckCircle2 />} label="Tekil eksik dipnot" value={missingFootnoteUnique.length} tone={missingFootnoteUnique.length ? "warn" : "ok"} />
         </section>
       )}
 
@@ -221,6 +234,24 @@ function App() {
               <article className="row" key={`${item.paragraphIndex}-${item.start}-${item.display}`}>
                 <strong>{item.display}</strong>
                 <span>{item.kind === "parenthetical" ? "Parantez içi" : "Anlatı atfı"} | Paragraf {item.paragraphIndex + 1}</span>
+              </article>
+            ))}
+          </Panel>
+
+          <Panel title="Kaynakçada Yer Almayan Tekil Dipnot Kaynakları" empty="Tüm dipnot atıfları kaynakçada eşleşti.">
+            {missingFootnoteUnique.map((item) => (
+              <article className="row warn-row" key={`${item.keys?.join("-")}-${item.display}`}>
+                <strong>{item.display}</strong>
+                <span>{item.occurrences ?? 1} geçiş</span>
+              </article>
+            ))}
+          </Panel>
+
+          <Panel title="Çözümlenemeyen Dipnot Atıfları" empty="Tüm dipnot atıfları başarıyla çözümlendi.">
+            {unresolvedFootnote.map((item) => (
+              <article className="row warn-row" key={`footnote-${item.id}`}>
+                <strong>Dipnot {item.id}</strong>
+                <span className="unresolved-text">{item.text}</span>
               </article>
             ))}
           </Panel>
