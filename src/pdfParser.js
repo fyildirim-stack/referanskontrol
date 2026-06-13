@@ -55,7 +55,12 @@ export async function extractTextFromPdf(file) {
       const lineItems = linesMap.get(y);
       // Sort items in a line from left to right (x ascending, x is transform[4])
       lineItems.sort((a, b) => a.transform[4] - b.transform[4]);
-      return lineItems.map((item) => item.str).join(" ");
+      const minX = lineItems[0] ? lineItems[0].transform[4] : 0;
+      return {
+        text: lineItems.map((item) => item.str).join(" "),
+        minX: minX,
+        y: y
+      };
     });
 
     pages.push({

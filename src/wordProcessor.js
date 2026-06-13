@@ -304,27 +304,127 @@ function looksLikeFootnote(text, references) {
 
 export async function analyzePdf(file) {
   const pages = await extractTextFromPdf(file);
-  const paragraphs = [];
-  let index = 0;
-
+  
+  const allLines = [];
   pages.forEach((page) => {
     page.lines.forEach((line) => {
-      if (line.trim().length > 3) {
-        paragraphs.push({
-          index: index++,
-          text: line.trim(),
+      // Filter running headers (y > 640) and page numbers (y < 25)
+      if (line.y <= 640 && line.y >= 25 && line.text.trim().length > 1) {
+        allLines.push({
+          text: line.text.trim(),
+          minX: line.minX,
+          y: line.y,
           pageNumber: page.pageNumber,
         });
       }
     });
   });
+
+  const headingIndex = allLines.findIndex(l => isReferencesHeading(l.text));
   
-  const referencesStart = findReferencesStartRobust(paragraphs);
-  const bodyParagraphs = referencesStart === -1 ? paragraphs : paragraphs.slice(0, referencesStart);
+  const bodyLines = headingIndex === -1 ? allLines : allLines.slice(0, headingIndex);
+  const bibLines = headingIndex === -1 ? [] : allLines.slice(headingIndex + 1);
+
+  // Reconstruct body paragraphs
+  const bodyParagraphs = [];
+  let currentBody = null;
+  let bodyIdx = 0;
+  for (let i = 0; i < bodyLines.length; i++) {
+    const line = bodyLines[i];
+    if (!currentBody) {
+      currentBody = { text: line.text, pageNumber: line.pageNumber };
+      continue;
+    }
+    
+    let shouldMerge = false;
+    if (currentBody.text.endsWith("-")) {
+      shouldMerge = true;
+    } else if (/^\p{Ll}/u.test(line.text)) {
+      shouldMerge = true;
+    } else if (!/[.?!:]\s*$/.test(currentBody.text)) {
+      shouldMerge = true;
+    }
+    
+    if (shouldMerge) {
+      if (currentBody.text.endsWith("-")) {
+        currentBody.text = currentBody.text.slice(0, -1) + line.text;
+      } else {
+        currentBody.text += " " + line.text;
+      }
+    } else {
+      currentBody.index = bodyIdx++;
+      bodyParagraphs.push(currentBody);
+      currentBody = { text: line.text, pageNumber: line.pageNumber };
+    }
+  }
+  if (currentBody) {
+    currentBody.index = bodyIdx++;
+    bodyParagraphs.push(currentBody);
+  }
+
+  // Reconstruct bibliography paragraphs
+  const bibParagraphs = [];
+  let currentBib = null;
+  let bibIdx = 0;
+  
+  const nonShortBibLines = bibLines.filter(l => l.text.length > 10);
+  const baseMargin = nonShortBibLines.length > 0 ? Math.min(...nonShortBibLines.map(l => l.minX)) : 60;
+
+  for (let i = 0; i < bibLines.length; i++) {
+    const line = bibLines[i];
+    if (!currentBib) {
+      currentBib = { text: line.text, pageNumber: line.pageNumber };
+      continue;
+    }
+    
+    const isContinuation = line.minX > baseMargin + 5;
+    if (isContinuation) {
+      if (currentBib.text.endsWith("-")) {
+        currentBib.text = currentBib.text.slice(0, -1) + line.text;
+      } else {
+        currentBib.text += " " + line.text;
+      }
+    } else {
+      currentBib.index = bibIdx++;
+      bibParagraphs.push(currentBib);
+      currentBib = { text: line.text, pageNumber: line.pageNumber };
+    }
+  }
+  if (currentBib) {
+    currentBib.index = bibIdx++;
+    bibParagraphs.push(currentBib);
+  }
+
+  let paragraphs = [];
+  let referencesStart = -1;
+  if (headingIndex === -1) {
+    paragraphs = bodyParagraphs;
+  } else {
+    referencesStart = bodyParagraphs.length;
+    
+    const headingParagraph = {
+      text: allLines[headingIndex].text,
+      pageNumber: allLines[headingIndex].pageNumber,
+      index: referencesStart,
+    };
+    
+    paragraphs = [
+      ...bodyParagraphs,
+      headingParagraph,
+      ...bibParagraphs
+    ];
+  }
+  
+  // Re-assign exact indices
+  paragraphs.forEach((p, idx) => {
+    p.index = idx;
+  });
+
+  const parsedBodyParagraphs = referencesStart === -1 ? paragraphs : paragraphs.slice(0, referencesStart);
   const referenceParagraphs = referencesStart === -1 ? [] : paragraphs.slice(referencesStart + 1);
 
   // In-text citations
-  const citations = bodyParagraphs.flatMap((paragraph) => {
+  const citations = parsedBodyParagraphs.flatMap((paragraph) => {
     const found = findCitations(paragraph.text, paragraph.index);
     return found.map(c => ({
       ...c,
@@ -343,7 +443,7 @@ export async function analyzePdf(file) {
   const footnotes = [];
   let footnoteIdCounter = 1;
 
-  bodyParagraphs.forEach((paragraph) => {
+  parsedBodyParagraphs.forEach((paragraph) => {
     const match = /^\s*([¹²³⁴⁵⁶⁷⁸⁹⁰\d]+)\s*[\.\s-]*\s*([\p{L}].*)$/u.exec(paragraph.text);
     if (match) {
       const numStr = convertSuperscriptToNormal(match[1]);
