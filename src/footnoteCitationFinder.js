@@ -26,7 +26,7 @@ function resolveFootnoteCitation(footnote, resolved, references) {
     keys: [],
   };
 
-  // 1. Try: short APA pattern (Yazar, Yıl) or Yazar (Yıl)
+  // 1. Try inline or narrative APA citation match (e.g. Smith (2020))
   const inlineCitations = findCitations(footnote.text, 0);
   if (inlineCitations.length > 0) {
     const keys = inlineCitations.flatMap((c) => c.keys).filter(Boolean);
@@ -39,10 +39,49 @@ function resolveFootnoteCitation(footnote, resolved, references) {
     }
   }
 
-  // 2. Try: repeat pattern (a.g.e., ibid, op. cit., etc.)
+  // Split footnote by semicolon in case it contains multiple citations
+  const parts = footnote.text.split(';').map(p => p.trim()).filter(Boolean);
+  const allKeys = [];
+  let kind = "footnote-unresolved";
+
+  for (const part of parts) {
+    // 2. Try parenthetical or inline citation match
+    const yearMatch = findYearInReference(part);
+    if (yearMatch && yearMatch.index < 280) {
+      const authorSegment = getActualAuthorSegment(part, yearMatch);
+      if (authorSegment && /[\p{L}]/u.test(authorSegment)) {
+        const authors = extractReferenceAuthors(authorSegment);
+        if (authors.length > 0) {
+          const year = yearMatch[1];
+          const aliases = extractReferenceAliases(authorSegment, year);
+          const keys = [...new Set([...authors.map((author) => makeKey(author, year)), ...aliases])];
+          allKeys.push(...keys);
+          kind = "footnote-fulltext";
+          continue;
+        }
+      }
+    }
+
+    // 3. Try shortened citation match
+    const shortened = resolveShortenedFootnote(part, references);
+    if (shortened) {
+      allKeys.push(...shortened.keys);
+      kind = shortened.kind;
+      continue;
+    }
+  }
+
+  if (allKeys.length > 0) {
+    return {
+      ...base,
+      kind,
+      keys: [...new Set(allKeys)],
+    };
+  }
+
+  // 4. Try repeat pattern
   const repeatMatch = REPEAT_PATTERNS.exec(footnote.text);
   if (repeatMatch) {
-    // Walk back to find the previous resolved footnote
     const allIds = Array.from(resolved.keys());
     if (allIds.length > 0) {
       const lastId = allIds[allIds.length - 1];
@@ -56,94 +95,90 @@ function resolveFootnoteCitation(footnote, resolved, references) {
         };
       }
     }
-    // No previous footnote to resolve from
-    return base;
-  }
-
-  // 3. Try: full Chicago/ISNAD pattern (Yazar Adı, Başlık, (Yıl), ...)
-  const yearMatch = findYearInReference(footnote.text);
-  if (yearMatch && yearMatch.index < 280) {
-    const authorSegment = getActualAuthorSegment(footnote.text, yearMatch);
-    if (authorSegment && /[\p{L}]/u.test(authorSegment)) {
-      const authors = extractReferenceAuthors(authorSegment);
-      if (authors.length > 0) {
-        const year = yearMatch[1];
-        const aliases = extractReferenceAliases(authorSegment, year);
-        const keys = [...new Set([...authors.map((author) => makeKey(author, year)), ...aliases])];
-        return {
-          ...base,
-          kind: "footnote-fulltext",
-          keys,
-        };
-      }
-    }
-  }
-
-  // 4. Try: shortened footnote citation (matching using references dictionary)
-  const shortened = resolveShortenedFootnote(footnote.text, references);
-  if (shortened) {
-    return {
-      ...base,
-      kind: shortened.kind,
-      keys: shortened.keys,
-    };
   }
 
   return base;
 }
 
-function resolveShortenedFootnote(footnoteText, references) {
+// Custom Turkish Folding
+function foldTurkish(str) {
+  return str
+    .toLowerCase()
+    .replace(/[ıİ]/g, "i")
+    .replace(/[ğĞ]/g, "g")
+    .replace(/[üÜ]/g, "u")
+    .replace(/[şŞ]/g, "s")
+    .replace(/[öÖ]/g, "o")
+    .replace(/[çÇ]/g, "c");
+}
+
+function cleanWithSpaces(str) {
+  return foldTurkish(str)
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function resolveShortenedFootnote(partText, references) {
   if (!references || !references.length) return null;
 
-  // Extract text inside quotation marks
-  const quoteRegex = /[“"‘«']([^”"’»']+)[”"’»']/g;
-  let match = quoteRegex.exec(footnoteText);
-  if (!match) return null;
+  const quoteRegex = /[“"‘«']([^”"’»']+)[”"’»']/;
+  const quoteMatch = partText.match(quoteRegex);
+  
+  const cleanPart = cleanWithSpaces(partText);
+  const partWords = cleanPart.split(' ');
 
-  const quotedTitle = match[1].trim();
-  if (quotedTitle.length < 3) return null;
-
-  // Normalize helper
-  const clean = (str) =>
-    str
-      .toLowerCase()
-      .replace(/[ıİ]/g, "i")
-      .replace(/[ğĞ]/g, "g")
-      .replace(/[üÜ]/g, "u")
-      .replace(/[şŞ]/g, "s")
-      .replace(/[öÖ]/g, "o")
-      .replace(/[çÇ]/g, "c")
-      .replace(/[^\w]/g, "")
-      .trim();
-
-  const cleanQuoted = clean(quotedTitle);
-  if (!cleanQuoted) return null;
+  let bestMatch = null;
+  let bestScore = 0;
 
   for (const ref of references) {
-    const refTitle = ref.structured?.title || "";
-    const cleanRefTitle = clean(refTitle);
-    
-    // Check if titles match (either one contains the other)
-    const titleMatches = cleanRefTitle.includes(cleanQuoted) || cleanQuoted.includes(cleanRefTitle);
-    if (!titleMatches) continue;
-
-    // Check if any author of this reference is mentioned in the footnote text
     const authors = ref.structured?.authors || [];
+    if (!authors.length) continue;
+
+    // Check if author family name is present in footnote part
     const authorMatches = authors.some((author) => {
       const familyName = typeof author === "string" ? author : author.family;
       if (!familyName) return false;
-      const cleanFamily = clean(familyName);
-      const cleanFootnote = clean(footnoteText);
-      return cleanFootnote.includes(cleanFamily);
+      const cleanFamily = cleanWithSpaces(familyName);
+      return partWords.includes(cleanFamily);
     });
 
-    if (authorMatches) {
-      return {
-        kind: "footnote-shortened",
-        keys: ref.keys,
-      };
+    if (!authorMatches) continue;
+
+    // Now score the title match
+    const title = ref.structured?.title || "";
+    if (!title) continue;
+
+    const cleanTitle = cleanWithSpaces(title);
+    
+    // Check 1: Quotation match if available
+    if (quoteMatch) {
+      const quoted = cleanWithSpaces(quoteMatch[1]);
+      if (cleanTitle.includes(quoted) || quoted.includes(cleanTitle)) {
+        return { keys: ref.keys, kind: "footnote-shortened" };
+      }
+    }
+
+    // Check 2: Exact title substring match
+    if (cleanPart.includes(cleanTitle)) {
+      return { keys: ref.keys, kind: "footnote-shortened" };
+    }
+
+    // Check 3: Word overlap scoring
+    const titleWords = cleanTitle.split(' ').filter(w => w.length > 2);
+    if (titleWords.length > 0) {
+      const matchingWords = titleWords.filter(w => partWords.includes(w));
+      const score = matchingWords.length / titleWords.length;
+      
+      const firstTitleWord = cleanTitle.split(' ')[0];
+      const firstWordMatches = firstTitleWord && firstTitleWord.length > 2 && partWords.includes(firstTitleWord);
+
+      if (score > bestScore && (score >= 0.3 || firstWordMatches)) {
+        bestScore = score;
+        bestMatch = { keys: ref.keys, kind: "footnote-shortened" };
+      }
     }
   }
 
-  return null;
+  return bestMatch;
 }

@@ -126,4 +126,47 @@ describe("Footnote Citation Finder Tests", () => {
     expect(result[0].kind).toBe("footnote-shortened");
     expect(result[0].keys).toContain("yazıcı:2012");
   });
+
+  it("should resolve shortened footnote citation without quotation marks", () => {
+    const references = [
+      {
+        keys: ["kasifi:nodate"],
+        structured: {
+          title: "Reşeḥât ʿAynü’l-ḥayât",
+          authors: [{ family: "Kâşifî", given: "Fahrüddîn Alî Safî", full: "Kâşifî, Fahrüddîn Alî Safî b. Hüseyn Vâiz" }]
+        }
+      }
+    ];
+    const footnotes = [
+      { id: "1", text: "Kâşifî, Reşeḥât, 88." }
+    ];
+    const result = findFootnoteCitations(footnotes, references);
+    expect(result[0].kind).toBe("footnote-shortened");
+    expect(result[0].keys).toContain("kasifi:nodate");
+  });
+
+  it("should resolve footnotes containing multiple citations separated by semicolons", () => {
+    const references = [
+      {
+        keys: ["barthold:1973"],
+        structured: {
+          title: "İslam Medeniyeti Tarihi",
+          authors: [{ family: "Barthold", given: "W", full: "Barthold, W." }]
+        }
+      },
+      {
+        keys: ["hodgson:1995"],
+        structured: {
+          title: "İslam’ın Serüveni",
+          authors: [{ family: "Hodgson", given: "M.G.S.", full: "Hodgson, M.G.S." }]
+        }
+      }
+    ];
+    const footnotes = [
+      { id: "1", text: "Barthold, İslam Medeniyeti Tarihi, 69; Hodgson, İslam’ın Serüveni, 2/472." }
+    ];
+    const result = findFootnoteCitations(footnotes, references);
+    expect(result[0].keys).toContain("barthold:1973");
+    expect(result[0].keys).toContain("hodgson:1995");
+  });
 });

@@ -1,12 +1,12 @@
 import { makeKey } from "./citationFinder.js";
 
 export function referenceYearRegex() {
-  return /\(((?:19|20)\d{2}[a-z]?|n\.d\.|t\.y\.)(?:[^)]*)\)/i;
+  return /\(((?:19|20)\d{2}[a-z]?|n\.d\.|t\.y\.|t\.s\.|ts\.)(?:[^)]*)\)/i;
 }
 
 export function findYearInReference(text) {
   // 1. Try parenthesized year, e.g. (2020) or (Aralık 2020) or (t.y.)
-  const parenRegex = /\((?:[^)]*?\s+)?((?:19|20)\d{2}[a-z]?|t\.y\.|n\.d\.)[^)]*?\)/i;
+  const parenRegex = /\((?:[^)]*?\s+)?((?:19|20)\d{2}[a-z]?|t\.y\.|n\.d\.|t\.s\.|ts\.)[^)]*?\)/i;
   const parenMatch = text.match(parenRegex);
   if (parenMatch) {
     const res = [parenMatch[0], parenMatch[1]];
@@ -20,7 +20,7 @@ export function findYearInReference(text) {
     .replace(/(?:Erişim|Accessed)[\s:]*\d{1,2}[./-]\d{1,2}[./-]\d{2,4}/gi, "")
     .replace(/(?:Erişim|Accessed)[\s:]*\d{1,2}\s+\p{L}+\s+\d{2,4}/giu, "");
 
-  const yearRegex = /\b((?:19|20)\d{2}[a-z]?|t\.y\.|n\.d\.)\b/gi;
+  const yearRegex = /\b((?:19|20)\d{2}[a-z]?|t\.y\.|n\.d\.|t\.s\.|ts\.)\b/gi;
   let lastMatch = null;
   let match;
   while ((match = yearRegex.exec(cleanText)) !== null) {
@@ -40,7 +40,7 @@ export function findYearInReference(text) {
   }
 
   // 3. Fallback: search for any year in the text
-  const fallbackRegex = /\b((?:19|20)\d{2}[a-z]?|t\.y\.|n\.d\.)\b/i;
+  const fallbackRegex = /\b((?:19|20)\d{2}[a-z]?|t\.y\.|n\.d\.|t\.s\.|ts\.)\b/i;
   const fallbackMatch = text.match(fallbackRegex);
   if (fallbackMatch) {
     const res = [fallbackMatch[0], fallbackMatch[1]];
@@ -52,7 +52,8 @@ export function findYearInReference(text) {
 }
 
 export function getActualAuthorSegment(text, yearMatch) {
-  if (yearMatch && yearMatch.index < 120) {
+  const isApasque = yearMatch && yearMatch[0] && yearMatch[0].startsWith("(") && yearMatch.index < 60;
+  if (isApasque) {
     return text.slice(0, yearMatch.index).trim();
   }
   
@@ -67,8 +68,15 @@ export function getActualAuthorSegment(text, yearMatch) {
     if (idx > 150) break;
     const before = text.slice(0, idx).trim();
     const lastWord = before.split(/\s+/).at(-1) || "";
-    if (lastWord.length === 1 && lastWord === lastWord.toUpperCase()) {
-      continue;
+    if (lastWord.length === 1) {
+      if (lastWord === lastWord.toLowerCase()) {
+        continue;
+      }
+      const afterDot = text.slice(idx + match[0].length).trim();
+      const nextWord = afterDot.split(/\s+/)[0] || "";
+      if (/^[\p{L}]\.?$/u.test(nextWord)) {
+        continue;
+      }
     }
     return before;
   }
@@ -78,32 +86,41 @@ export function getActualAuthorSegment(text, yearMatch) {
 
 export function parseReference(text, paragraphIndex) {
   const yearMatch = findYearInReference(text);
-  if (!yearMatch) return null;
+  let year = "nodate";
+  let dateText = "t.y.";
+  let yearIndex = text.length;
+  let yearMatchText = "";
 
-  const authorSegment = getActualAuthorSegment(text, yearMatch);
+  if (yearMatch) {
+    year = yearMatch[1];
+    dateText = yearMatch[0].replace(/[()]/g, "");
+    yearIndex = yearMatch.index;
+    yearMatchText = yearMatch[0];
+  }
+
+  const authorSegment = getActualAuthorSegment(text, yearMatch || { index: yearIndex });
   const authors = parseAuthorNames(authorSegment);
   if (!authors.length) return null;
-
-  const year = yearMatch[1];
-  const dateText = yearMatch[0].replace(/[()]/g, "");
 
   let title = "";
   let container = "";
 
   const quoteRegex = /[“"‘«']([^”"’»']+)[”"’»']/;
   const quoteMatch = text.match(quoteRegex);
+  const isApasque = yearMatch && yearMatch[0] && yearMatch[0].startsWith("(") && yearMatch.index < 60;
+
   if (quoteMatch) {
     title = quoteMatch[1].trim();
     const afterQuote = text.slice(quoteMatch.index + quoteMatch[0].length).trim();
     container = afterQuote
-      .replace(yearMatch[0], "")
+      .replace(yearMatchText, "")
       .replace(/https?:\/\/\S+/gi, "")
       .replace(/(?:Erişim|Accessed)[\s:]*\d{1,2}[./-]\d{1,2}[./-]\d{2,4}/gi, "")
       .replace(/(?:Erişim|Accessed)[\s:]*\d{1,2}\s+\p{L}+\s+\d{2,4}/giu, "")
       .replace(/[.,\s]+$/, "")
       .trim();
   } else {
-    if (yearMatch.index < 120) {
+    if (isApasque) {
       const afterDate = String(text.slice(yearMatch.index + yearMatch[0].length)).replace(/[ \t\r\n]+/g, " ").trim().replace(/^\.\s*/, "");
       const withoutUrl = String(afterDate.replace(/https?:\/\/\S+/gi, "")).replace(/[ \t\r\n]+/g, " ").trim().replace(/[.]+$/g, "");
       const titleSplit = splitTitleAndContainer(withoutUrl);
@@ -111,7 +128,7 @@ export function parseReference(text, paragraphIndex) {
       container = titleSplit.container;
     } else {
       const afterAuthor = text.slice(authorSegment.length).trim().replace(/^\.\s*/, "");
-      const cleanAfterAuthor = afterAuthor.replace(yearMatch[0], "").trim().replace(/[.,\s]+$/, "");
+      const cleanAfterAuthor = afterAuthor.replace(yearMatchText, "").trim().replace(/[.,\s]+$/, "");
       const parts = cleanAfterAuthor.split(/\.\s+/);
       if (parts.length > 0) {
         title = parts[0].trim();

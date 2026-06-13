@@ -1,8 +1,8 @@
 export function findCitations(text, paragraphIndex) {
   const matches = [];
   const occupied = [];
-  const parenthetical = /\(([^()]{0,280}\b(?:19|20)\d{2}[a-z]?[^()]*)\)/giu;
-  const narrative = /([\p{Lu}][\p{L}'-]+(?:\s+(?:ve|and|&)\s+[\p{Lu}][\p{L}'-]+|\s+et al\.)?)\s*\(((?:19|20)\d{2}[a-z]?)\)/gu;
+  const parenthetical = /\(([^()]{0,280}\b(?:(?:19|20)\d{2}[a-z]?|n\.d\.|t\.y\.|t\.s\.|ts\.)\b[^()]*)\)/giu;
+  const narrative = /([\p{Lu}][\p{L}'-]+(?:\s+(?:ve|and|&)\s+[\p{Lu}][\p{L}'-]+|\s+et al\.)?)\s*\(((?:(?:19|20)\d{2}[a-z]?|n\.d\.|t\.y\.|t\.s\.|ts\.))\)/gu;
 
   for (const match of text.matchAll(parenthetical)) {
     const content = match[1];
@@ -42,7 +42,8 @@ export function findCitations(text, paragraphIndex) {
 }
 
 export function looksLikeCitation(content) {
-  return /\b(?:19|20)\d{2}[a-z]?\b/i.test(content) && /[\p{L}]/u.test(content) && !/^(?:19|20)\d{2}[a-z]?$/i.test(content.trim());
+  const containsYear = /\b(?:19|20)\d{2}[a-z]?\b/i.test(content) || /\b(?:n\.d\.|t\.y\.|t\.s\.|ts\.)\b/i.test(content);
+  return containsYear && /[\p{L}]/u.test(content) && !/^(?:19|20)\d{2}[a-z]?|n\.d\.|t\.y\.|t\.s\.|ts\.$/i.test(content.trim());
 }
 
 export function splitCitationContent(content) {
@@ -50,7 +51,7 @@ export function splitCitationContent(content) {
 }
 
 export function parseCitationPart(part) {
-  const yearMatch = part.match(/\b((?:19|20)\d{2}[a-z]?|n\.d\.|t\.y\.)\b/i);
+  const yearMatch = part.match(/\b((?:19|20)\d{2}[a-z]?|n\.d\.|t\.y\.|t\.s\.|ts\.)\b/i);
   if (!yearMatch) return null;
   const authorPart = part.slice(0, yearMatch.index).replace(/\b(see|bkz|cf|e\.g\.|ör\.|örn)\b\.?/giu, "").trim();
   if (!authorPart || !isPlausibleCitationAuthorPart(authorPart)) return null;
@@ -83,8 +84,8 @@ export function normalize(value) {
 }
 
 export function normalizeYear(year) {
-  const normalized = String(year).toLowerCase().replace(/\s+/g, "");
-  if (normalized === "n.d." || normalized === "t.y.") return "nodate";
+  const normalized = String(year).toLowerCase().replace(/\s+/g, "").replace(/\.+$/g, "");
+  if (normalized === "n.d" || normalized === "t.y" || normalized === "ts" || normalized === "t.s" || normalized === "nodate") return "nodate";
   return normalized;
 }
 

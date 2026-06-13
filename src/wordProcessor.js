@@ -129,25 +129,16 @@ export async function convertDocxToFootnotes(file, analysis) {
 
 function buildReferenceEntries(referenceParagraphs) {
   const entries = [];
-  let current = null;
-
   referenceParagraphs.forEach((paragraph) => {
-    splitReferenceParagraph(paragraph.rawText || paragraph.text).forEach((line) => {
-      if (!line) return;
-      if (isReferenceStart(line)) {
-        if (current) entries.push(current);
-        current = { text: line, paragraphIndex: paragraph.index };
-        return;
-      }
-      if (current) current.text = `${current.text} ${line}`;
-    });
+    const text = normalizeVisibleText(paragraph.rawText || paragraph.text);
+    if (text.length > 5) {
+      entries.push({
+        text: text.replace(/^\s*\[\d+\]\s*/, ""),
+        paragraphIndex: paragraph.index
+      });
+    }
   });
-
-  if (current) entries.push(current);
-  return entries.map((entry) => ({
-    ...entry,
-    text: normalizeVisibleText(entry.text).replace(/^\s*\[\d+\]\s*/, ""),
-  }));
+  return entries;
 }
 
 function splitReferenceParagraph(text) {
