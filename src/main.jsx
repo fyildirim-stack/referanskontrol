@@ -117,18 +117,18 @@ function App() {
     <main className="shell">
       <section className="topbar">
         <div>
-          <h1>APA Dipnot Denetçisi</h1>
-          <p>Word belgesindeki APA atıflarını denetler, İSNAD dipnot/kaynakça çıktısı üretir ve kaynakları Scholar/Zotero akışına hazırlar.</p>
+          <h1>Referans Kontrol</h1>
+          <p>Word belgesindeki metin içi ve dipnot atıflarını kaynakçayla karşılaştırır. APA ve Chicago/İSNAD stillerinde işlem yapabilir, İSNAD dipnot/kaynakça çıktısı üretir.</p>
         </div>
-        <span className="privacy">v0.2.0</span>
+        <span className="privacy">v0.3.0</span>
       </section>
 
       <section className="workspace">
         <label className="dropzone">
           <input type="file" accept=".docx" onChange={(event) => handleFile(event.target.files?.[0])} />
           <UploadCloud size={42} />
-          <strong>{fileName || "DOCX makaleyi seçin"}</strong>
-          <span>Kaynakça başlığı “Kaynakça”, “Kaynaklar” veya “References” olarak ayrılmış olmalı.</span>
+          <strong>{fileName || “Word belgesini seçin”}</strong>
+          <span>Kaynakça başlığı “Kaynakça”, “Kaynaklar” veya “References” olarak ayrılmış olmalı. Metin içi ve dipnot atıfları analiz edilecektir.</span>
         </label>
 
         <div className="actions">
@@ -195,7 +195,7 @@ function App() {
               <article className="source-row" key={record.id}>
                 <label className="approve">
                   <input type="checkbox" checked={approvedIds.has(record.id)} onChange={() => toggleApproved(record.id)} />
-                  <span>Onayla</span>
+                  <span>✓ Onayla</span>
                 </label>
                 <div className="source-main">
                   <strong>{record.title}</strong>
@@ -260,7 +260,7 @@ function App() {
 
       <section className="note">
         <AlertTriangle size={18} />
-        <p>Google Scholar bağlantıları kullanıcı tetiklidir; otomatik kazıma yapılmaz. Zotero export dosyaları onaylanan kayıtları, hiç onay yoksa tüm ayrıştırılmış kaynakları içerir.</p>
+        <p>Google Scholar bağlantıları kullanıcı tetiklidir; otomatik kazıma yapılmaz. Zotero export dosyaları onaylanan kayıtları, hiç onay yoksa tüm ayrıştırılmış kaynakları içerir. Çözümlenemeyen dipnot atıfları manuel inceleme gerektirir.</p>
       </section>
     </main>
   );
