@@ -150,16 +150,10 @@ export function parseReference(text, paragraphIndex) {
   let publisher = "";
   let place = "";
   if (type === "book" || type === "chapter") {
-    const pubInfo = parsePublisherAndPlace(container);
-    if (pubInfo.publisher) {
-      publisher = pubInfo.publisher;
-      place = pubInfo.place;
-      if (type === "book") {
-        container = "";
-      } else {
-        container = container.replace(new RegExp(escapeRegex(publisher) + `(?:\\s*,\\s*` + escapeRegex(place) + `)?`, "i"), "").trim().replace(/[.,\s]+$/, "");
-      }
-    }
+    const pubInfo = extractPublisherAndPlaceFromContainer(container, type);
+    publisher = pubInfo.publisher;
+    place = pubInfo.place;
+    container = pubInfo.cleanContainer;
   }
 
   const structured = {
@@ -218,6 +212,33 @@ export function parseApaReference(text, authorSegment, yearMatch) {
 }
 
 export function splitTitleAndContainer(text) {
+  const chapterMatch = text.match(/(.*?)\s+(?:,\s*)?(İçinde|içinde|In)\b\s+(.*)/);
+  if (chapterMatch) {
+    const beforeInside = chapterMatch[1].trim();
+    const afterInside = chapterMatch[3].trim();
+    
+    let chapterTitle = beforeInside;
+    let bookTitle = "";
+    
+    if (beforeInside.includes(".")) {
+      const dotIdx = beforeInside.lastIndexOf(".");
+      chapterTitle = beforeInside.slice(0, dotIdx).trim();
+      bookTitle = beforeInside.slice(dotIdx + 1).trim();
+    } else if (beforeInside.includes(",")) {
+      const commaIdx = beforeInside.indexOf(",");
+      chapterTitle = beforeInside.slice(0, commaIdx).trim();
+      bookTitle = beforeInside.slice(commaIdx + 1).trim();
+    }
+    
+    const matchWord = chapterMatch[2];
+    const container = `${bookTitle} ${matchWord} ${afterInside}`.trim();
+    
+    return {
+      title: chapterTitle.replace(/^[.,\s“"‘«]+|[.,\s”"’»]+$/g, "").trim(),
+      container: container.replace(/^[.,\s]+|[.,\s]+$/g, "").trim()
+    };
+  }
+
   const rawParts = text.split(/(?<=\.)\s+(?=\p{Lu}|\d)/u).map((part) => part.trim()).filter(Boolean);
   if (!rawParts.length) return { title: text, container: "" };
   
@@ -243,20 +264,52 @@ export function splitTitleAndContainer(text) {
 }
 
 export function parseAuthorNames(authorSegment) {
-  return authorSegment
-    .split(/\s*(?:,?\s*&\s*|,?\s+and\s+|,?\s+ve\s+|,|[\u2013\u2014]|\s+-\s*|\s*-\s+)\s*/iu)
-    .flatMap((part) => part.split(/\s*,\s*(?=[\p{Lu}][\p{L}'-]+\s*,)/u))
-    .map((part) => part.trim().replace(/[.]+$/g, ""))
-    .filter(Boolean)
-    .map((part) => {
-      if (part.includes(",")) {
-        const [family, given = ""] = part.split(/\s*,\s*/);
-        return { family: family.trim(), given: given.trim(), full: `${given.trim()} ${family.trim()}`.trim() };
+  const blocks = authorSegment
+    .split(/\s*(?:,\s*&|,\s*\band\b|,\s*\bve\b|\b&\b|\band\b|\bve\b|[\u2013\u2014]|\s+-\s*|\s*-\s+)\s*/iu)
+    .map(b => b.trim())
+    .filter(Boolean);
+
+  const authors = [];
+  for (const block of blocks) {
+    const parts = block.split(/\s*,\s*/).map(p => p.trim()).filter(Boolean);
+    if (parts.length === 0) continue;
+
+    if (parts.length === 1) {
+      const part = parts[0];
+      const words = part.split(/\s+/).filter(Boolean);
+      if (words.length > 1) {
+        const family = words[words.length - 1].replace(/[()]/g, "").replace(/\b(?:et al|vd)\.?/giu, "").trim();
+        const given = words.slice(0, -1).join(" ").replace(/[()]/g, "").replace(/\b(?:et al|vd)\.?/giu, "").trim();
+        authors.push({
+          family,
+          given,
+          full: part
+        });
+      } else {
+        authors.push({ family: part, given: "", full: part });
       }
-      // Clean name without dots or special chars for fallback
-      const cleanFam = part.replace(/[()]/g, "").replace(/\b(?:et al|vd)\.?/giu, "").replace(/[^\p{L}'-]/gu, " ").trim().split(/\s+/).at(-1) || "";
-      return { family: cleanFam, given: "", full: part };
-    });
+    } else {
+      for (let i = 0; i < parts.length; i += 2) {
+        if (i + 1 < parts.length) {
+          const family = parts[i].replace(/[()]/g, "").replace(/\b(?:et al|vd)\.?/giu, "").trim();
+          const given = parts[i + 1].replace(/[()]/g, "").replace(/\b(?:et al|vd)\.?/giu, "").trim();
+          authors.push({
+            family,
+            given,
+            full: `${given} ${family}`.trim()
+          });
+        } else {
+          const family = parts[i].replace(/[()]/g, "").replace(/\b(?:et al|vd)\.?/giu, "").trim();
+          authors.push({
+            family,
+            given: "",
+            full: family
+          });
+        }
+      }
+    }
+  }
+  return authors;
 }
 
 export function formatBibliographyAuthors(authors, fallback) {
@@ -277,11 +330,7 @@ export function inferReferenceType(container, url, doi) {
 }
 
 export function extractReferenceAuthors(authorSegment) {
-  return authorSegment
-    .split(/\s*(?:,?\s*&\s*|,?\s+and\s+|,?\s+ve\s+|,|[\u2013\u2014]|\s+-\s*|\s*-\s+)\s*/iu)
-    .flatMap((part) => part.split(/\s*,\s*(?=[\p{Lu}][\p{L}'-]+\s*,)/u))
-    .map((part) => part.split(",")[0].replace(/[()]/g, "").replace(/\b(?:et al|vd)\.?/giu, "").replace(/[^\p{L}'-]/gu, " ").trim().split(/\s+/).at(-1) || "")
-    .filter(Boolean);
+  return parseAuthorNames(authorSegment).map(a => a.family).filter(Boolean);
 }
 
 export function extractReferenceAliases(authorSegment, year) {
@@ -292,11 +341,13 @@ export function extractReferenceAliases(authorSegment, year) {
   });
 
   const withoutParentheses = authorSegment.replace(/\([^)]*\)/g, "").replace(/[.]+$/g, "").trim();
-  const acronym = withoutParentheses
-    .split(/\s+/)
-    .map((word) => word.match(/^\p{Lu}/u)?.[0] || "")
-    .join("");
-  if (acronym.length >= 2) aliases.push(makeKey(acronym, year));
+  if (!withoutParentheses.includes(",")) {
+    const acronym = withoutParentheses
+      .split(/\s+/)
+      .map((word) => word.match(/^\p{Lu}/u)?.[0] || "")
+      .join("");
+    if (acronym.length >= 2) aliases.push(makeKey(acronym, year));
+  }
   return aliases;
 }
 
@@ -304,13 +355,18 @@ export function formatIsnadFootnote(item) {
   if (!item) return "";
   const author = item.authorText || "Yazar belirtilmemiş";
   const title = item.title ? `“${item.title}”` : "Başlık belirtilmemiş";
-  const container = item.container ? `, ${item.container}` : "";
-  const date = item.dateText ? ` (${formatDateText(item.dateText)})` : "";
   const url = item.url ? `, ${item.url}` : "";
 
-  if (item.type === "article") return `${author}, ${title}${container}${date}${url}.`;
-  if (item.type === "web") return `${author}, ${title}${container}${date}${url}.`;
-  return `${author}, ${item.title || "Başlık belirtilmemiş"}${item.container ? ` (${item.container}, ${item.year})` : ` (${item.year})`}${url}.`;
+  if (item.type === "article" || item.type === "web") {
+    const container = item.container ? `, ${item.container}` : "";
+    const date = item.dateText ? ` (${formatDateText(item.dateText)})` : "";
+    return `${author}, ${title}${container}${date}${url}.`;
+  }
+
+  const pubPlace = [item.place, item.publisher].filter(Boolean).join(": ");
+  const pubInfo = [pubPlace, item.year].filter(Boolean).join(", ");
+  const parenContent = item.container ? `${item.container}, ${pubInfo}` : pubInfo;
+  return `${author}, ${item.title || "Başlık belirtilmemiş"} (${parenContent})${url}.`;
 }
 
 export function formatIsnadBibliography(item) {
@@ -318,12 +374,16 @@ export function formatIsnadBibliography(item) {
   const author = item.bibliographyAuthorText || item.authorText || "Yazar belirtilmemiş";
   const title = item.title ? `“${item.title}”` : "Başlık belirtilmemiş";
   const container = item.container ? `. ${item.container}` : "";
-  const date = item.dateText ? `. ${formatDateText(item.dateText)}` : "";
   const url = item.url ? `. ${item.url}` : "";
 
-  if (item.type === "article") return `${author}. ${title}${container}${date}${url}.`;
-  if (item.type === "web") return `${author}. ${title}${container}${date}${url}.`;
-  return `${author}. ${item.title || "Başlık belirtilmemiş"}${container ? `. ${item.container}` : ""}. ${item.year}${url}.`;
+  if (item.type === "article" || item.type === "web") {
+    const date = item.dateText ? `. ${formatDateText(item.dateText)}` : "";
+    return `${author}. ${title}${container}${date}${url}.`;
+  }
+
+  const pubPlace = [item.place, item.publisher].filter(Boolean).join(": ");
+  const pubInfo = [pubPlace, item.year].filter(Boolean).join(", ");
+  return `${author}. ${item.title || "Başlık belirtilmemiş"}${container ? `. ${item.container}` : ""}. ${pubInfo}${url}.`;
 }
 
 export function buildIsnadBibliography(references) {
@@ -364,6 +424,13 @@ export function parsePublisherAndPlace(container) {
         place: parts[1].trim()
       };
     }
+    const lastPart = parts[parts.length - 1];
+    if (cities.test(lastPart)) {
+      return {
+        publisher: parts.slice(0, -1).join(", ").trim(),
+        place: lastPart.trim()
+      };
+    }
     return {
       publisher: parts[0].trim(),
       place: parts[1].trim()
@@ -374,6 +441,64 @@ export function parsePublisherAndPlace(container) {
     publisher: clean,
     place: ""
   };
+}
+
+export function extractPublisherAndPlaceFromContainer(container, type) {
+  if (!container) return { publisher: "", place: "", cleanContainer: "" };
+  const clean = container.replace(/[.]+$/g, "").trim();
+  
+  const partsByDot = clean.split(/\.\s+/);
+  if (partsByDot.length > 1) {
+    const lastPart = partsByDot[partsByDot.length - 1];
+    const pubInfo = parsePublisherAndPlace(lastPart);
+    if (pubInfo.publisher) {
+      const lastIdx = clean.lastIndexOf(lastPart);
+      const cleanContainer = clean.slice(0, lastIdx).trim().replace(/[.,\s]+$/, "");
+      return {
+        publisher: pubInfo.publisher,
+        place: pubInfo.place,
+        cleanContainer
+      };
+    }
+  }
+  
+  const partsByComma = clean.split(/,\s*/);
+  if (partsByComma.length > 2) {
+    const lastTwo = partsByComma.slice(-2).join(", ");
+    const pubInfo = parsePublisherAndPlace(lastTwo);
+    if (pubInfo.publisher && pubInfo.place) {
+      const lastIdx = clean.lastIndexOf(partsByComma[partsByComma.length - 2]);
+      const cleanContainer = clean.slice(0, lastIdx).trim().replace(/[.,\s]+$/, "");
+      return {
+        publisher: pubInfo.publisher,
+        place: pubInfo.place,
+        cleanContainer
+      };
+    }
+    
+    const lastOne = partsByComma[partsByComma.length - 1];
+    const pubInfoLast = parsePublisherAndPlace(lastOne);
+    if (pubInfoLast.publisher && !pubInfoLast.place) {
+      const lastIdx = clean.lastIndexOf(lastOne);
+      const cleanContainer = clean.slice(0, lastIdx).trim().replace(/[.,\s]+$/, "");
+      return {
+        publisher: pubInfoLast.publisher,
+        place: "",
+        cleanContainer
+      };
+    }
+  }
+  
+  const pubInfo = parsePublisherAndPlace(clean);
+  if (pubInfo.publisher) {
+    return {
+      publisher: pubInfo.publisher,
+      place: pubInfo.place,
+      cleanContainer: type === "book" ? "" : container
+    };
+  }
+  
+  return { publisher: "", place: "", cleanContainer: container };
 }
 
 export function escapeRegex(str) {

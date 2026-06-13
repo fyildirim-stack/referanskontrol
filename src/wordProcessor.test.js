@@ -63,6 +63,22 @@ describe("ISNAD Formatter Tests", () => {
     const bib = formatIsnadBibliography(structured);
     expect(bib).toBe("Smith, J. - A. Doe. Modern Web Development. Publishing Press. 2020.");
   });
+
+  it("should parse chapter references with İçinde and extract publisher/place correctly", () => {
+    const text = "Akdemir, E. (2012). Avrupa Bütünleşmesinin Tarihçesi, Avrupa Birliği Tarihçe, Teoriler, Kurumlar ve Politikalar İçinde Akçay, B. ve Göçmen, İ. (Editörler), (s. 37-63). Seçkin Yayınları, Ankara.";
+    const ref = parseReference(text, 0);
+    expect(ref).not.toBeNull();
+    expect(ref.structured.title).toBe("Avrupa Bütünleşmesinin Tarihçesi");
+    expect(ref.structured.container).toBe("Avrupa Birliği Tarihçe, Teoriler, Kurumlar ve Politikalar İçinde Akçay, B. ve Göçmen, İ. (Editörler), (s. 37-63)");
+    expect(ref.structured.publisher).toBe("Seçkin Yayınları");
+    expect(ref.structured.place).toBe("Ankara");
+    expect(ref.structured.authors).toHaveLength(1);
+    expect(ref.structured.authors[0].family).toBe("Akdemir");
+    expect(ref.structured.authors[0].given).toBe("E.");
+    
+    expect(ref.isnadBibliography).toBe("Akdemir, E.. Avrupa Bütünleşmesinin Tarihçesi. Avrupa Birliği Tarihçe, Teoriler, Kurumlar ve Politikalar İçinde Akçay, B. ve Göçmen, İ. (Editörler), (s. 37-63). Ankara: Seçkin Yayınları, 2012.");
+    expect(ref.isnadFootnote).toBe("E. Akdemir, Avrupa Bütünleşmesinin Tarihçesi (Avrupa Birliği Tarihçe, Teoriler, Kurumlar ve Politikalar İçinde Akçay, B. ve Göçmen, İ. (Editörler), (s. 37-63), Ankara: Seçkin Yayınları, 2012).");
+  });
 });
 
 describe("PDF Analysis Tests", () => {
