@@ -1,0 +1,208 @@
+=== SUMMARY ===
+Total Bibliography Paragraphs: 50
+Parsed Bibliography Entries: 49
+Total Footnotes: 147
+Resolved Footnotes: 147
+Unresolved Footnotes: 0
+
+=== PARSED REFERENCES (Total: 49) ===
+1: Keys: [aka:1994, ai:1994] | Title: "Mirza Şahruh ve Zamanı" | Year: "1994" | Display: Aka, İsmail. Mirza Şahruh ve Zamanı. Ankara: Türk Tarih Kurumu Yayınları, 1994.
+2: Keys: [aka:2010, ai:2010] | Title: "Şâhruh" | Year: "2010" | Display: Aka, İsmail. “Şâhruh”. Türkiye Diyanet Vakfı İslâm Ansiklopedisi. 38/293-295. İstanbul: TDV Yayınları, 2010.
+3: Keys: [aka:1991, ai:1991] | Title: "Timur ve Devleti" | Year: "1991" | Display: Aka, İsmail. Timur ve Devleti. Ankara: Türk Tarih Kurumu, 1991.
+4: Keys: [aka:2012, ai:2012] | Title: "Timurlular" | Year: "2012" | Display: Aka, İsmail. “Timurlular”. Türkiye Diyanet Vakfı İslâm Ansiklopedisi. 41/177-180. İstanbul: TDV Yayınları, 2012.
+5: Keys: [akdag:2017, ae:2017] | Title: "Ebû Hanîfe" | Year: "2017" | Display: Akdağ, Eyyup. “Ebû Hanîfe’ye Nisbet Edilen el-Vasiyye Adlı Eserin Kastamonu İl Halk Kütüphanesi’nde Bulunan Yazma Nüshalarının Değerlendirilmesi”. IV. Uluslararası Şeyh Şa’bân-ı Velî Sempozyumu -Hanefîlik-Mâturîdîlik-, 05-07 Mayıs 2017 I (2017), 109-121.
+6: Keys: [alan:2015, ah:2015] | Title: "Bozkırdan Cennet Bahçesine Timurlular" | Year: "2015" | Display: Alan, Hayrunnisa. Bozkırdan Cennet Bahçesine Timurlular. İstanbul: Ötüken Neşriyat, 2015.
+7: Keys: [algar:2007, ah:2007] | Title: "Nakşibendilik" | Year: "2007" | Display: Algar, Hamid. Nakşibendilik. çev. A.Cüneyd Köksal. İstanbul: İnsan Yayınları, 4. Basım, 2007.
+8: Keys: [altıkulac:1999, at:1999] | Title: "İbnü" | Year: "1999" | Display: Altıkulaç, Tayyar. “İbnü’l-Cezerî”. Türkiye Diyanet Vakfı İslâm Ansiklopedisi. 20/551-557. İstanbul: TDV Yayınları, 1999.
+9: Keys: [attar:1984, af:1984] | Title: "Tezkiretü’l-evliya" | Year: "1984" | Display: Attâr, Feridüddin. Tezkiretü’l-evliya. Bursa: İlim ve Kültür Yayınları, 1984.
+10: Keys: [baberti:2009, be:2009] | Title: "Şerhu’l-Vasiyye" | Year: "2009" | Display: Bâbertî, Ekmelüddin el-. Şerhu’l-Vasiyye. Amman: Dârü’l-Feth, 2009.
+11: Keys: [barthold:1973, bw:1973] | Title: "İslam Medeniyeti Tarihi" | Year: "1973" | Display: Barthold, W. İslam Medeniyeti Tarihi. Ankara: Türk Tarih Kurumu Yayınları, 1973.
+12: Keys: [beksac:2010, be:2010] | Title: "Şâh-ı Zinde" | Year: "2010" | Display: Beksaç, Engin. “Şâh-ı Zinde”. Türkiye Diyanet Vakfı İslâm Ansiklopedisi. 38/267-269. İstanbul: TDV Yayınları, 2010.
+13: Keys: [bilgin:2022, be:2022] | Title: "İmâm-ı A" | Year: "2022" | Display: Bilgin, Emrah. “İmâm-ı A’zam’ın el-Vasiyye’sine Dair Yazılmış Bir Akâidnâme: ‘Manzûme-i Akâ’id-i Tercüme-ti Nukırrî’”. İHYA Uluslararası İslam Araştırmaları Dergisi VIII/1 (2022), 153-187.
+14: Keys: [bouvat:1979, bl:1979] | Title: "Şâhruh Mirza" | Year: "1979" | Display: Bouvat, L. “Şâhruh Mirza”. İslam Ansiklopedisi : İslam Alemi Tarih, Coğrafya, Etnografya ve Biyografya Lugati. XI/286-288. İstanbul: Milli Eğitim Basımevi, 1979.
+15: Keys: [corbin:2013, ch:2013] | Title: "İslam felsefesi tarihi" | Year: "2013" | Display: Corbin, Henry. İslam felsefesi tarihi. İstanbul: İletişim Yayınları, 7. baskı., 2013.
+16: Keys: [celik:nodate, cir:nodate] | Title: "XV. Asır Osmanlı Entelektüel Çevresi İçin Teftâzânî Ne İfade Eder?: Hâşiye Literatüründe Otorite Olarak Teftâzânî" | Year: "nodate" | Display: Çelik, İmam Rabbani. “XV. Asır Osmanlı Entelektüel Çevresi İçin Teftâzânî Ne İfade Eder?: Hâşiye Literatüründe Otorite Olarak Teftâzânî”. Osmanlı Düşüncesi: Kaynakları ve Tartışma Konuları, 191-207.
+17: Keys: [eraslan:2021, ey:2021] | Title: "Mâtürîdîlik ve Tasavvuf" | Year: "2021" | Display: Eraslan, Yunus. Mâtürîdîlik ve Tasavvuf. Ankara: Türkiye Diyanet Vakfı Yayınları, 2021.
+18: Keys: [golpınarlı:1970, ga:1970] | Title: "Oniki İmâm" | Year: "1970" | Display: Gölpınarlı, Abdülbâkıy. Oniki İmâm. İstanbul: Der Yayınevi, 1970.
+19: Keys: [gumus:1984, gs:1984] | Title: "Seyyid Şerif Cürcanî" | Year: "1984" | Display: Gümüş, Sadreddin. Seyyid Şerif Cürcanî. istanbul: İSAV, 1984.
+20: Keys: [gumusoglu:2014, gh:2014] | Title: "Ehl-i Sünnet ve İmamiyye Şiasının Ehl-i Beyt Kavramına Yükledikleri Anlamlar" | Year: "2014" | Display: Gümüşoğlu, Hasan. “Ehl-i Sünnet ve İmamiyye Şiasının Ehl-i Beyt Kavramına Yükledikleri Anlamlar”. Cumhuriyet Üniversitesi İlahiyat Fakültesi Dergisi XVIII/2 (2014), 291-318-318.
+21: Keys: [hodgson:1995, hm:1995] | Title: "İslam’ın Serüveni" | Year: "1995" | Display: Hodgson, M.G.S. İslam’ın Serüveni. çev. Alp Eker - Mutlu Bozkurt. 3 Cilt. İstanbul: İz Yayıncılık, 1995.
+22: Keys: [inalcık:1938, ihadn:1938] | Title: "İstanbul: Timaş Yayınları, 2016" | Year: "1938" | Display: İnalcık, Halil. Akademik Ders Notları (1938-1986). İstanbul: Timaş Yayınları, 2016.
+23: Keys: [jakubovskij:2019, jaj:2019] | Title: "Timur ve Timurîler Devrinde Semerkand" | Year: "2019" | Display: Jakubovskij, Aleksandr Ju. Timur ve Timurîler Devrinde Semerkand. ed. Ilyas Kamalov. çev. Sabur Rasol. Ankara: Türk Tarih Kurumu, 2. baskı., 2019.
+24: Keys: [karadas:nodate, kc:nodate] | Title: "Ekmelüddîn Bâbertî" | Year: "nodate" | Display: Karadaş, Cağfer. “Ekmelüddîn Bâbertî’nin Ebû Hanife’nin ‘El-Vasıyye ve El-Fıkhu’l-Ekber’ Risalelerine Yazdığı Şerhler”. Ekmelüddîn Bâbertî Sempozyumu: Ekmelüddîn Bâbertî’yi Keşif Yolunda, 215-224.
+25: Keys: [kasifi:nodate, kfashv:nodate] | Title: "Reşeḥât ʿAynü’l-ḥayât" | Year: "nodate" | Display: Kâşifî, Fahrüddîn Alî Safî b. Hüseyn Vâiz. Reşeḥât ʿAynü’l-ḥayât. çev. M.Murad el-Kazanî. Diyarbekir: el-Mektebetü’l-İslamiyye, ts.
+26: Keys: [klaviyo:1975] | Title: "Timur Devrinde Semerkanda Yolculuk" | Year: "1975" | Display: Klaviyo. Timur Devrinde Semerkanda Yolculuk. çev. Ömer Rıza Doğrul. İstanbul: Nakışlar Yayınevi, 1975.
+27: Keys: [kutlu:nodate, ks:nodate] | Title: "İslâm Mezhepleri Tarihinde Usûl Sorunu" | Year: "nodate" | Display: Kutlu, Sönmez. “İslâm Mezhepleri Tarihinde Usûl Sorunu”. İslâmî İlimlerde Metodoloji: Usûl Mes’elesi 1, 391-440.
+28: Keys: [manz:2013, mbf:2013] | Title: "Timurlu İran’ında İktidar, Siyaset ve Din" | Year: "2013" | Display: Manz, Beatrice Forbes. Timurlu İran’ında İktidar, Siyaset ve Din. çev. Dilek Şendil. Türkiye İş Bankası Kültür Yayınları, 2013.
+29: Keys: [oz:1994, om:1994] | Title: "Ehl-i Beyt" | Year: "1994" | Display: Öz, Mustafa. “Ehl-i Beyt”. Türkiye Diyanet Vakfı İslam Ansiklopedisi. 10/498-501. İstanbul: Türkiye Diyanet Vakfı, 1994.
+30: Keys: [oz:2012, om:2012] | Title: "el-Vasiyye" | Year: "2012" | Display: Öz, Mustafa. “el-Vasiyye”. Türkiye Diyanet Vakfı İslâm Ansiklopedisi. 42/545-546. İstanbul: TDV Yayınları, 2012.
+31: Keys: [ozen:2011, os:2011] | Title: "Teftâzânî" | Year: "2011" | Display: Özen, Şükrü. “Teftâzânî”. Türkiye Diyanet Vakfı İslâm Ansiklopedisi. 40/299-308. İstanbul: TDV Yayınları, 2011.
+32: Keys: [parsa:nodate, pm:nodate] | Title: "Faslü’l-hitâb" | Year: "nodate" | Display: Pârsa, Muhammed. Faslü’l-hitâb. Taşkent: Gulam Hasan Arifcanov Litografyası (Taş Baskı Atölyesi), ts.
+33: Keys: [rebhami:1980, rmm:1980] | Title: "Riyâd’ün-Nâsıhîn Tercümesi" | Year: "1980" | Display: Rebhâmî, Mevlânâ M. Riyâd’ün-Nâsıhîn Tercümesi. çev. S. Fârûk Meyân. İstanbul: Berekât Yayınevi, 2. Basım, 1980.
+34: Keys: [rebhami:1980, rm:1980] | Title: "Riyâdü’n-nâsıhîn Müslümanlara Nasihat" | Year: "1980" | Display: Rebhâmî, Muhammed. Riyâdü’n-nâsıhîn Müslümanlara Nasihat. çev. A. Faruk Meyan. İstanbul: Berekât Yayınevi, 2. Basım, 1980.
+35: Keys: [roux:1994, rj:1994] | Title: "Aksak Timur İslam’ın Kutsal Savaşçısı" | Year: "1994" | Display: Roux, Jean-Paul. Aksak Timur İslam’ın Kutsal Savaşçısı. çev. Ali Rıza Yalt. İstanbul: Milliyet Yayınları, 1994.
+36: Keys: [sidiqi:2024, ska:2024] | Title: "Timurlular Döneminde Herat Şehrinin Başkent Olarak Yükselişi" | Year: "2024" | Display: Sidiqi, Khwaja Abdullah. Timurlular Döneminde Herat Şehrinin Başkent Olarak Yükselişi. Konya: Selçuk, Doktora, 2024.
+37: Keys: [subtelny:2007, sme:2007] | Title: "Timurids in Transition: Turko-Persian Politics and Acculturation in Medieval Iran" | Year: "2007" | Display: Subtelny, Maria E. Timurids in Transition: Turko-Persian Politics and Acculturation in Medieval Iran. Leiden: Brill, 2007.
+38: Keys: [subtelny:1995, smekb:1995] | Title: "The Curriculum of Islamic Higher Learning in Timurid Iran in the Light of the Sunni Revival under Shāh-Rukh" | Year: "1995" | Display: Subtelny, Maria Eva - Khalidov, B. “The Curriculum of Islamic Higher Learning in Timurid Iran in the Light of the Sunni Revival under Shāh-Rukh”. Journal of the American Oriental Society 115/210-236 (1995).
+39: Keys: [tarı:2021, tn:2021] | Title: "Teftâzânî’nin Hayatı ve Es-Saʻdînî Adlı Şerhinin İncelenmesi" | Year: "2021" | Display: Tarı, Nihat. Teftâzânî’nin Hayatı ve Es-Saʻdînî Adlı Şerhinin İncelenmesi. Ankara: İksad, 2021.
+40: Keys: [tosun:2007, tn:2007] | Title: "Bahaeddin Nakşbend Hayatı, Görüşleri, Tarikatı" | Year: "2007" | Display: Tosun, Necdet. Bahaeddin Nakşbend Hayatı, Görüşleri, Tarikatı. İnsan Yayınları, 3. Basım, 2007.
+41: Keys: [tosun:nodate, tn:nodate] | Title: "Mâturdiyye ve Tasavvuf İlişkisi" | Year: "nodate" | Display: Tosun, Necdet. “Mâturdiyye ve Tasavvuf İlişkisi”. Uluslararası Maturidilik Sempozyumu (Dünü, Bugünü ve Geleceği): Bildiriler, 157-163.
+42: Keys: [tosun:nodate, tn:nodate] | Title: "Mâturdiyye ve Tasavvuf İlişkisi" | Year: "nodate" | Display: Tosun, Necdet. “Mâturdiyye ve Tasavvuf İlişkisi”. Uluslararası Maturidilik Sempozyumu (Dünü, Bugünü ve Geleceği): Bildiriler, 157-163.
+43: Keys: [tosun:2007, tn:2007] | Title: "Nurbahşiyye" | Year: "2007" | Display: Tosun, Necdet. “Nurbahşiyye”. Türkiye Diyanet Vakfı İslâm Ansiklopedisi. 33/248-249. İstanbul: TDV Yayınları, 2007.
+44: Keys: [turan:2019, to:2019] | Title: "Selçuklular târihi ve Türk-İslâm medeniyeti" | Year: "2019" | Display: Turan, Osman. Selçuklular târihi ve Türk-İslâm medeniyeti. İstanbul: Ötüken, 22. basim., 2019.
+45: Keys: [yasaroglu:2006, ymk:2006] | Title: "Musannifek" | Year: "2006" | Display: Yaşaroğlu, M. Kâmil. “Musannifek”. Türkiye Diyanet Vakfı İslâm Ansiklopedisi. 31/239-240. İstanbul: TDV Yayınları, 2006.
+46: Keys: [yuvalı:1993, ya:1993] | Title: "Çağatay Hanlığı" | Year: "1993" | Display: Yuvalı, Abdülkadir. “Çağatay Hanlığı”. Türkiye Diyanet Vakfı İslâm Ansiklopedisi. 8/177-178. İstanbul: TDV Yayınları, 1993.
+47: Keys: [yuksel:2009, yms:2009] | Title: "Şahruh" | Year: "2009" | Display: Yüksel, Musa Şamil. “Şahruh’un Sünnî Canlandırma Siyaseti”. Tarih Okulu [Tarih Okulu Dergisi (TOD) 5 (2009), 95-110.
+48: Keys: [yuksel:2021, yms:2021] | Title: "Timurlularda Din-Devlet İlişkisi" | Year: "2021" | Display: Yüksel, Musa Şamil. Timurlularda Din-Devlet İlişkisi. Ankara: Türk Tarih Kurumu, 2021.
+49: Keys: [ihtilaf:2020, mucadele:2020] | Title: "Ankara : Türk Tarih Kurumu" | Year: "2020" | Display: Doğuşundan günümüze tasavvufa dair tartışmalar : on üç asırlık ihtilaf ve mücadele. Ankara : Türk Tarih Kurumu, 2020. http://ktp.isam.org.tr/detayzt.php?navdil=tr&idno=386748&wKitaplar=tasavvufa+dair+tart%C4%B1%C5%9Fmalar
+
+=== RESOLVED FOOTNOTES (Total: 147) ===
+FN 1: [footnote-fulltext] Keys: [barthold:1973, wbimt:1973] Text: W. Barthold, İslam Medeniyeti Tarihi (Ankara: Türk Tarih Kurumu Yayınları, 1973), 68.
+FN 2: [footnote-fulltext] Keys: [roux:1994, jratiks:1994] Text: Jean-Paul Roux, Aksak Timur İslam’ın Kutsal Savaşçısı, çev. Ali Rıza Yalt (İstanbul: Milliyet Yayınları, 1994), 27.
+FN 3: [footnote-fulltext] Keys: [roux:1994, rj:1994, aka:2012, ia:2012, aka:1991, devleti:1991, iatd:1991] Text: Roux, Aksak Timur İslam’ın Kutsal Savaşçısı, 69-72; İsmail Aka, “Timurlular”, Türkiye Diyanet Vakfı İslâm Ansiklopedisi (İstanbul: TDV Yayınları, 2012), 41/177; İsmail Aka, Timur ve Devleti (Ankara: Türk Tarih Kurumu, 1991), 10.
+FN 4: [footnote-fulltext] Keys: [jakubovskij:2019, semerkand:2019, ajjttds:2019] Text: Aleksandr Ju Jakubovskij, Timur ve Timurîler Devrinde Semerkand, ed. Ilyas Kamalov, çev. Sabur Rasol (Ankara: Türk Tarih Kurumu, 2019), 1-8.
+FN 5: [footnote-fulltext] Keys: [inalcık:1938, hiadn:1938] Text: Halil İnalcık, Akademik Ders Notları (1938-1986) (İstanbul: Timaş Yayınları, 2016), 25.
+FN 6: [footnote-shortened-exact-title] Keys: [inalcık:1938, iadn:1938, roux:1994, rj:1994] Text: İnalcık, Akademik Ders Notları (1938-1986), 28-29; Roux, Aksak Timur İslam’ın Kutsal Savaşçısı, 241-242.
+FN 7: [footnote-shortened-exact-title] Keys: [jakubovskij:2019, jaj:2019] Text: Jakubovskij, Timur ve Timurîler Devrinde Semerkand, 6.
+FN 8: [footnote-fulltext] Keys: [jakubovskij:2019, jaj:2019, klaviyo:1975, ktdsy:1975, inalcık:1938, iadn:1938] Text: Jakubovskij, Timur ve Timurîler Devrinde Semerkand, 7-8; Klaviyo, Timur Devrinde Semerkanda Yolculuk, çev. Ömer Rıza Doğrul (İstanbul: Nakışlar Yayınevi, 1975), 169,175-176; İnalcık, Akademik Ders Notları (1938-1986), 26.
+FN 9: [footnote-fulltext] Keys: [edilmis:1938, istemistir:1938, ti:1938] Text: Timur bölgede tesis ettiği iktidar ile hâkim-i mutlak kabul edilmiş ve İnalcık’a göre halife olmayı istemiştir. Bkz. İnalcık, Akademik Ders Notları (1938-1986), 25.
+FN 10: [footnote-fulltext] Keys: [manz:2013, din:2013, bfmtiisd:2013, aka:1994, zamanı:1994, iamsz:1994] Text: Beatrice Forbes Manz, Timurlu İran’ında İktidar, Siyaset ve Din, çev. Dilek Şendil (Türkiye İş Bankası Kültür Yayınları, 2013); İsmail Aka, Mirza Şahruh ve Zamanı (Ankara: Türk Tarih Kurumu Yayınları, 1994).
+FN 11: [footnote-fulltext] Keys: [rebhami:1980, mrrmn:1980] Text: Muhammed Rebhâmî, Riyâdü’n-nâsıhîn Müslümanlara Nasihat, çev. A. Faruk Meyan (İstanbul: Berekât Yayınevi, 1980), 14-17.
+FN 12: [footnote-fulltext] Keys: [hodgson:1995, mhis:1995] Text: M.G.S Hodgson, İslam’ın Serüveni, çev. Alp Eker - Mutlu Bozkurt (İstanbul: İz Yayıncılık, 1995), 2/472.
+FN 13: [footnote-fulltext] Keys: [yuvalı:1993, ay:1993] Text: Abdülkadir Yuvalı, “Çağatay Hanlığı”, Türkiye Diyanet Vakfı İslâm Ansiklopedisi (İstanbul: TDV Yayınları, 1993), 8/177.
+FN 14: [footnote-fulltext] Keys: [inalcık:1938, iadn:1938] Text: İnalcık, Akademik Ders Notları (1938-1986), 25.
+FN 15: [footnote-shortened-exact-title] Keys: [roux:1994, rj:1994] Text: Roux, Aksak Timur İslam’ın Kutsal Savaşçısı, 70.
+FN 16: [footnote-fulltext] Keys: [khalidov:1995, mesbk:1995] Text: Maria Eva Subtelny - B. Khalidov, “The Curriculum of Islamic Higher Learning in Timurid Iran in the Light of the Sunni Revival under Shāh-Rukh”, Journal of the American Oriental Society 115/210-236 (1995), 211.
+FN 17: [footnote-shortened-exact-title] Keys: [aka:1994, ai:1994] Text: Aka, Mirza Şahruh ve Zamanı, 208.
+FN 18: [footnote-shortened-exact-title] Keys: [barthold:1973, bw:1973, hodgson:1995, hm:1995] Text: Barthold, İslam Medeniyeti Tarihi, 69; Hodgson, İslam’ın Serüveni, 2/472.
+FN 19: [footnote-fulltext] Keys: [bouvat:1979, lb:1979] Text: L. Bouvat, “Şâhruh Mirza”, İslam Ansiklopedisi : İslam Alemi Tarih, Coğrafya, Etnografya ve Biyografya Lugati (İstanbul: Milli Eğitim Basımevi, 1979), XI/286.
+FN 20: [footnote-shortened-quoted] Keys: [aka:2010, ia:2010, bouvat:1979, bl:1979] Text: İsmail Aka, “Şâhruh”, Türkiye Diyanet Vakfı İslâm Ansiklopedisi (İstanbul: TDV Yayınları, 2010), 38/293; Bouvat, “Şâhruh Mirza”, XI/286.
+FN 21: [footnote-shortened-quoted] Keys: [aka:2010, ai:2010] Text: Aka, “Şâhruh”, 38/294.
+FN 22: [footnote-shortened-exact-title] Keys: [rebhami:1980, rm:1980] Text: Rebhâmî, Riyâdü’n-nâsıhîn Müslümanlara Nasihat, 19.
+FN 23: [footnote-shortened-exact-title] Keys: [manz:2013, mbf:2013] Text: Manz, Timurlu İran’ında İktidar, Siyaset ve Din, 231.
+FN 24: [footnote-shortened-quoted] Keys: [yuksel:2009, msy:2009, subtelny:1995, smekb:1995] Text: Musa Şamil Yüksel, “Şahruh’un Sünnî Canlandırma Siyaseti”, Tarih Okulu [Tarih Okulu Dergisi (TOD) 5 (2009), 100; Subtelny - Khalidov, “The Curriculum of Islamic Higher Learning in Timurid Iran in the Light of the Sunni Revival under Shāh-Rukh”, 211.
+FN 25: [footnote-shortened-quoted] Keys: [alan:2015, habcbt:2015, bouvat:1979, bl:1979] Text: Hayrunnisa Alan, Bozkırdan Cennet Bahçesine Timurlular (İstanbul: Ötüken Neşriyat, 2015), 108; Bouvat, “Şâhruh Mirza”, XI/287.
+FN 26: [footnote-shortened-quoted] Keys: [bouvat:1979, bl:1979] Text: Bouvat, “Şâhruh Mirza”, XI/287.
+FN 27: [footnote-shortened-exact-title] Keys: [aka:1991, ai:1991] Text: Aka, Timur ve Devleti, 106.
+FN 28: [footnote-shortened-quoted] Keys: [aka:1994, ai:1994, aka:2010, ai:2010] Text: Aka, Mirza Şahruh ve Zamanı, 183; Aka, “Şâhruh”, 38/295.
+FN 29: [footnote-shortened-exact-title] Keys: [aka:1994, ai:1994] Text: Aka, Mirza Şahruh ve Zamanı, 184.
+FN 30: [footnote-shortened-exact-title] Keys: [aka:1991, ai:1991] Text: Aka, Timur ve Devleti, 67.
+FN 31: [footnote-fulltext] Keys: [yuksel:2021, msytdi:2021] Text: Musa Şamil Yüksel, Timurlularda Din-Devlet İlişkisi (Ankara: Türk Tarih Kurumu, 2021), 81.
+FN 32: [footnote-shortened-exact-title] Keys: [aka:1991, ai:1991] Text: Aka, Timur ve Devleti, 118-120.
+FN 33: [footnote-shortened-exact-title] Keys: [aka:1994, ai:1994] Text: Aka, Mirza Şahruh ve Zamanı, 159.
+FN 34: [footnote-fulltext] Keys: [yasaroglu:2006, momyemky:2006] Text: Meşhur Osmanlı alimi Musannifek (ö. 875/1470) Yusuf-i Evbehî’nin öğrencilerindendir. bkz. M. Kâmil Yaşaroğlu, “Musannifek”, Türkiye Diyanet Vakfı İslâm Ansiklopedisi (İstanbul: TDV Yayınları, 2006), 31/239.
+FN 35: [footnote-fulltext] Keys: [ozen:2011, so:2011] Text: Şükrü Özen, “Teftâzânî”, Türkiye Diyanet Vakfı İslâm Ansiklopedisi (İstanbul: TDV Yayınları, 2011), 40/299.
+FN 36: [footnote-shortened-exact-title] Keys: [aka:1991, ai:1991] Text: Aka, Timur ve Devleti, 119.
+FN 37: [footnote-fulltext] Keys: [subtelny:1995, smekb:1995, altıkulac:1999, ta:1999] Text: Subtelny - Khalidov, “The Curriculum of Islamic Higher Learning in Timurid Iran in the Light of the Sunni Revival under Shāh-Rukh”, 213; Tayyar Altıkulaç, “İbnü’l-Cezerî”, Türkiye Diyanet Vakfı İslâm Ansiklopedisi (İstanbul: TDV Yayınları, 1999), 20/552.
+FN 38: [footnote-shortened-exact-title] Keys: [manz:2013, mbf:2013] Text: Manz, Timurlu İran’ında İktidar, Siyaset ve Din, 291.
+FN 39: [footnote-shortened-exact-title] Keys: [aka:1991, ai:1991] Text: Aka, Timur ve Devleti, 133.
+FN 40: [footnote-shortened-exact-title] Keys: [rebhami:1980, rm:1980] Text: Rebhâmî, Riyâdü’n-nâsıhîn Müslümanlara Nasihat, 13.
+FN 41: [footnote-shortened-exact-title] Keys: [rebhami:1980, rm:1980] Text: Rebhâmî, Riyâdü’n-nâsıhîn Müslümanlara Nasihat, 13.
+FN 42: [footnote-shortened-exact-title] Keys: [aka:1991, ai:1991] Text: Aka, Timur ve Devleti, 116.
+FN 43: [footnote-fulltext] Keys: [sidiqi:2024, kastdhsboy:2024] Text: Khwaja Abdullah Sidiqi, Timurlular Döneminde Herat Şehrinin Başkent Olarak Yükselişi (Konya: Selçuk, Doktora, 2024), 116.
+FN 44: [footnote-shortened-exact-title] Keys: [rebhami:1980, rm:1980] Text: Rebhâmî, Riyâdü’n-nâsıhîn Müslümanlara Nasihat, 14.
+FN 45: [footnote-shortened-exact-title] Keys: [rebhami:1980, rm:1980] Text: Rebhâmî, Riyâdü’n-nâsıhîn Müslümanlara Nasihat, 15.
+FN 46: [footnote-shortened-exact-title] Keys: [rebhami:1980, rm:1980] Text: Rebhâmî, Riyâdü’n-nâsıhîn Müslümanlara Nasihat, 15.
+FN 47: [footnote-shortened-exact-title] Keys: [rebhami:1980, rm:1980] Text: Rebhâmî, Riyâdü’n-nâsıhîn Müslümanlara Nasihat, 17.
+FN 48: [footnote-fulltext] Keys: [m:1980, mm:1980] Text: Mevlânâ M. Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, çev. S. Fârûk Meyân (İstanbul: Berekât Yayınevi, 1980), 15.
+FN 49: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 16.
+FN 50: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 15.
+FN 51: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 22.
+FN 52: [footnote-fulltext] Keys: [rebhami:1980, rmm:1980, akdag:2017, ea:2017, oz:2012, mo:2012] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 101; Eyyup Akdağ, “Ebû Hanîfe’ye Nisbet Edilen el-Vasiyye Adlı Eserin Kastamonu İl Halk Kütüphanesi’nde Bulunan Yazma Nüshalarının Değerlendirilmesi”, IV. Uluslararası Şeyh Şa’bân-ı Velî Sempozyumu -Hanefîlik-Mâturîdîlik-, 05-07 Mayıs 2017 I (2017), 111; Mustafa Öz, “el-Vasiyye”, Türkiye Diyanet Vakfı İslâm Ansiklopedisi (İstanbul: TDV Yayınları, 2012), 42/545.
+FN 53: [footnote-shortened-quoted] Keys: [elbaberti:2009, es:2009, karadas:2014, ck:2014, oz:2012, om:2012] Text: Ekmelüddin el-Bâbertî, Şerhu’l-Vasiyye (Amman: Dârü’l-Feth, 2009); Cağfer Karadaş, “Ekmelüddîn Bâbertî’nin Ebû Hanife’nin ‘El-Vasıyye ve El-Fıkhu’l-Ekber’ Risalelerine Yazdığı Şerhler”, Ekmelüddîn Bâbertî Sempozyumu: Ekmelüddîn Bâbertî’yi Keşif Yolunda, (2014), 215-224; Öz, “el-Vasiyye”, 42/546.
+FN 54: [footnote-fulltext] Keys: [oz:2012, om:2012, bilgin:2022, eb:2022] Text: Öz, “el-Vasiyye”, 42/546; Emrah Bilgin, “İmâm-ı A’zam’ın el-Vasiyye’sine Dair Yazılmış Bir Akâidnâme: ‘Manzûme-i Akâ’id-i Tercüme-ti Nukırrî’”, İHYA Uluslararası İslam Araştırmaları Dergisi VIII/1 (2022), 153-187.
+FN 55: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 101.
+FN 56: [footnote-shortened-exact-title] Keys: [akdag:2017, ae:2017] Text: 1. maddenin tam tercümesi “İman dil ile ikrar, kalp ile tasdik ve kalp ile marifettir/bilmektir. İman artmaz ve eksilmez. Hz. Muhammed‟in ümmetinden günahkâr olan kimselerin hepsi gerçekte mümindirler, kâfir değildirler. Amel imandan ayrı, iman da amelden ayrıdır. Hayır ve şerrin takdiri Allah‟tandır. Hayır ve şerrin takdiri, Allah‟tan başkası tarafından gerçekleştirildiğini iddia eden kâfir olur ve tevhidi bâtıl olur” şeklindedir. Aşağıdaki birinci madde tercümesi ile karşılaştırıldığında serbest tercüme tarzı görülebilir. Bkz. Akdağ, “Ebû Hanîfe’ye Nisbet Edilen el-Vasiyye Adlı Eserin Kastamonu İl Halk Kütüphanesi’nde Bulunan Yazma Nüshalarının Değerlendirilmesi”, 114.
+FN 57: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 101.
+FN 58: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 101.
+FN 59: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 101.
+FN 60: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 38-39, 101-102.
+FN 61: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 102.
+FN 62: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 102.
+FN 63: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 102.
+FN 64: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 102.
+FN 65: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 102.
+FN 66: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 103.
+FN 67: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 103.
+FN 68: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 103.
+FN 69: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 103.
+FN 70: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 103.
+FN 71: [footnote-shortened-exact-title] Keys: [yuksel:2021, yms:2021] Text: Yüksel, Timurlularda Din-Devlet İlişkisi, 75.
+FN 72: [footnote-shortened-exact-title] Keys: [hodgson:1995, hm:1995] Text: Hodgson, İslam’ın Serüveni, 2/480.
+FN 73: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Özellikle bazı bölümler buna tahsis edilmiştir. Bkz. Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 94-105.
+FN 74: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 95.
+FN 75: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 96-97.
+FN 76: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 96-97.
+FN 77: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 97.
+FN 78: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 54-59.
+FN 79: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 104.
+FN 80: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 104.
+FN 81: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 104.
+FN 82: [footnote-fulltext] Keys: [gumusoglu:2014, hg:2014] Text: Hasan Gümüşoğlu, “Ehl-i Sünnet ve İmamiyye Şiasının Ehl-i Beyt Kavramına Yükledikleri Anlamlar”, Cumhuriyet Üniversitesi İlahiyat Fakültesi Dergisi XVIII/2 (2014), 300-305.
+FN 83: [footnote-shortened-exact-title] Keys: [inalcık:1938, iadn:1938, yuksel:2021, yms:2021] Text: İnalcık, Akademik Ders Notları (1938-1986), 25; Yüksel, Timurlularda Din-Devlet İlişkisi, 52.
+FN 84: [footnote-shortened-exact-title] Keys: [yuksel:2021, yms:2021] Text: Yüksel, Timurlularda Din-Devlet İlişkisi, 92-93.
+FN 85: [footnote-shortened-exact-title] Keys: [inalcık:1938, iadn:1938, klaviyo:1975] Text: İnalcık, Akademik Ders Notları (1938-1986), 26-27; Klaviyo, Timur Devrinde Semerkanda Yolculuk, 170.
+FN 86: [footnote-shortened-exact-title] Keys: [yuksel:2021, yms:2021] Text: Yüksel, Timurlularda Din-Devlet İlişkisi, 87.
+FN 87: [footnote-shortened-quoted] Keys: [ozen:2011, os:2011] Text: Özen, “Teftâzânî”, 40/303.
+FN 88: [footnote-shortened-quoted] Keys: [celik:nodate, cir:nodate] Text: Teftâzânî’nin ilim geleneğinde ve özellikle şerh geleneğindeki etkilerini görmek için bkz. İmam Rabbani Çelik, “XV. Asır Osmanlı Entelektüel Çevresi İçin Teftâzânî Ne İfade Eder?: Hâşiye Literatüründe Otorite Olarak Teftâzânî”, Osmanlı Düşüncesi: Kaynakları ve Tartışma Konuları, (2019), 191-207.
+FN 89: [footnote-fulltext] Keys: [gumus:1984, sgssc:1984] Text: Sadreddin Gümüş, Seyyid Şerif Cürcanî (istanbul: İSAV, 1984), 135.
+FN 90: [footnote-fulltext] Keys: [tarı:2021, ankara:2021, nttheasi:2021] Text: Nihat Tarı, Teftâzânî’nin Hayatı ve Es-Saʻdînî Adlı Şerhinin İncelenmesi (Ankara: İksad, 2021), 65.
+FN 91: [footnote-shortened-exact-title] Keys: [manz:2013, mbf:2013] Text: Manz, Timurlu İran’ında İktidar, Siyaset ve Din, 230.
+FN 92: [footnote-fulltext] Keys: [e:2007, me:2007] Text: Maria E. Subtelny, Timurids in Transition: Turko-Persian Politics and Acculturation in Medieval Iran (Leiden: Brill, 2007), 192.
+FN 93: [footnote-fulltext] Keys: [jakubovskij:2019, jaj:2019, beksac:2010, eb:2010] Text: Jakubovskij, Timur ve Timurîler Devrinde Semerkand, 23; Engin Beksaç, “Şâh-ı Zinde”, Türkiye Diyanet Vakfı İslâm Ansiklopedisi (İstanbul: TDV Yayınları, 2010), 38/267.
+FN 94: [footnote-shortened-exact-title] Keys: [jakubovskij:2019, jaj:2019] Text: Jakubovskij, Timur ve Timurîler Devrinde Semerkand, 23-24.
+FN 95: [footnote-shortened-exact-title] Keys: [aka:1994, ai:1994] Text: Aka, Mirza Şahruh ve Zamanı, 184.
+FN 96: [footnote-shortened-exact-title] Keys: [aka:1994, ai:1994] Text: Aka, Mirza Şahruh ve Zamanı, 168.
+FN 97: [footnote-shortened-exact-title] Keys: [manz:2013, mbf:2013] Text: Manz, Timurlu İran’ında İktidar, Siyaset ve Din, 286.
+FN 98: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 335-337.
+FN 99: [footnote-fulltext] Keys: [corbin:2013, hci:2013, golpınarlı:1970, agoi:1970, oz:1994, mo:1994] Text: Henry Corbin, İslam felsefesi tarihi (İstanbul: İletişim Yayınları, 2013), 1/129; Abdülbâkıy Gölpınarlı, Oniki İmâm (İstanbul: Der Yayınevi, 1970), 330-337; Mustafa Öz, “Ehl-i Beyt”, Türkiye Diyanet Vakfı İslam Ansiklopedisi (İstanbul: Türkiye Diyanet Vakfı, 1994), 10/499.
+FN 100: [footnote-shortened-quoted] Keys: [oz:1994, om:1994] Text: Öz, “Ehl-i Beyt”, 10/498.
+FN 101: [footnote-fulltext] Keys: [turan:2019, medeniyeti:2019, otst:2019] Text: Osman Turan, Selçuklular târihi ve Türk-İslâm medeniyeti (İstanbul: Ötüken, 2019), 326-327.
+FN 102: [footnote-fulltext] Keys: [attar:1984, fat:1984] Text: Feridüddin Attâr, Tezkiretü’l-evliya (Bursa: İlim ve Kültür Yayınları, 1984), 53-54.
+FN 103: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 335.
+FN 104: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 336.
+FN 105: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Örbek olarak bkz. Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 45,137,198.
+FN 106: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980, attar:1984, af:1984] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 336; Bu rivayet aynı şekilde Attâr’ın eserinde de geçmektedir. Bkz. Attâr, Tezkiretü’l-evliya, 251.
+FN 107: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 337.
+FN 108: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 242.
+FN 109: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 337.
+FN 110: [footnote-fulltext] Keys: [kutlu:2005, sk:2005] Text: Sönmez Kutlu, “İslâm Mezhepleri Tarihinde Usûl Sorunu”, İslâmî İlimlerde Metodoloji: Usûl Mes’elesi 1, (2005), 397 vd.
+FN 111: [footnote-shortened-exact-title] Keys: [hodgson:1995, hm:1995] Text: Hodgson, İslam’ın Serüveni, 2/497.
+FN 112: [footnote-shortened-exact-title] Keys: [hodgson:1995, hm:1995] Text: Hodgson, İslam’ın Serüveni, 2/472.
+FN 113: [footnote-shortened-exact-title] Keys: [manz:2013, mbf:2013] Text: Manz, Timurlu İran’ında İktidar, Siyaset ve Din, 285.
+FN 114: [footnote-shortened-exact-title] Keys: [aka:1994, ai:1994] Text: Aka, Mirza Şahruh ve Zamanı, 208-209.
+FN 115: [footnote-shortened-exact-title] Keys: [hodgson:1995, hm:1995] Text: Hodgson, İslam’ın Serüveni, 2/543.
+FN 116: [footnote-shortened-exact-title] Keys: [manz:2013, mbf:2013] Text: Manz, Timurlu İran’ında İktidar, Siyaset ve Din, 286.
+FN 117: [footnote-shortened-exact-title] Keys: [manz:2013, mbf:2013] Text: Manz, Timurlu İran’ında İktidar, Siyaset ve Din, 291.
+FN 118: [footnote-shortened-quoted] Keys: [manz:2013, mbf:2013, yuksel:2021, yms:2021, yuksel:2009, yms:2009] Text: Manz, Timurlu İran’ında İktidar, Siyaset ve Din, 288-289; Yüksel, Timurlularda Din-Devlet İlişkisi, 116; Yüksel, “Şahruh’un Sünnî Canlandırma Siyaseti”.
+FN 119: [footnote-shortened-quoted] Keys: [yuksel:2009, yms:2009] Text: Yüksel, “Şahruh’un Sünnî Canlandırma Siyaseti”, 98.
+FN 120: [footnote-shortened-exact-title] Keys: [manz:2013, mbf:2013, yuksel:2021, yms:2021] Text: Manz, Timurlu İran’ında İktidar, Siyaset ve Din, 288-289; Yüksel, Timurlularda Din-Devlet İlişkisi, 116.
+FN 121: [footnote-shortened-exact-title] Keys: [yuksel:2021, yms:2021] Text: Yüksel, Timurlularda Din-Devlet İlişkisi, 111-112.
+FN 122: [footnote-shortened-exact-title] Keys: [yuksel:2021, yms:2021] Text: Yüksel, Timurlularda Din-Devlet İlişkisi, 117.
+FN 123: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 242.
+FN 124: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 77.
+FN 125: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 77.
+FN 126: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 235, 238.
+FN 127: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 356.
+FN 128: [footnote-shortened-exact-title] Keys: [rebhami:1980, rmm:1980] Text: Rebhâmî, Riyâd’ün-Nâsıhîn Tercümesi, 238.
+FN 129: [footnote-shortened-exact-title] Keys: [aka:1994, ai:1994] Text: Aka, Mirza Şahruh ve Zamanı, 298.
+FN 130: [footnote-fulltext] Keys: [eraslan:2021, tasavvuf:2021, yemt:2021] Text: Yunus Eraslan, Mâtürîdîlik ve Tasavvuf (Ankara: Türkiye Diyanet Vakfı Yayınları, 2021), 107.
+FN 131: [footnote-shortened-exact-title] Keys: [aka:1994, ai:1994] Text: Aka, Mirza Şahruh ve Zamanı, 216.
+FN 132: [footnote-fulltext] Keys: [kasifi:ts., fashvkr:ts.] Text: Fahrüddîn Alî Safî b. Hüseyn Vâiz Kâşifî, Reşeḥât ʿAynü’l-ḥayât, çev. M.Murad el-Kazanî (Diyarbekir: el-Mektebetü’l-İslamiyye, ts.), 55.
+FN 133: [footnote-shortened-exact-title] Keys: [manz:2013, mbf:2013] Text: Manz, Timurlu İran’ında İktidar, Siyaset ve Din, 232.
+FN 134: [footnote-shortened-overlap] Keys: [kasifi:nodate, kfashv:nodate] Text: Hayatı için bkz. Kâşifî, Reşeḥât, 66-74.
+FN 135: [footnote-shortened-overlap] Keys: [kasifi:nodate, kfashv:nodate] Text: Kâşifî, Reşeḥât, 88.
+FN 136: [footnote-fulltext] Keys: [tosun:2007, gorusleri:2007, ntbnhgty:2007] Text: Necdet Tosun, Bahaeddin Nakşbend Hayatı, Görüşleri, Tarikatı (İnsan Yayınları, 2007), 338-345.
+FN 137: [footnote-shortened-exact-title] Keys: [aka:1991, ai:1991] Text: Aka, Timur ve Devleti, 135.
+FN 138: [footnote-fulltext] Keys: [bkz:2007, mpn:2007] Text: Muhammed Pârsa’nın Nakşî literatürdeki önemi için bkz. Hamid Algar, Nakşibendilik, çev. A.Cüneyd Köksal (İstanbul: İnsan Yayınları, 2007), 114-115.
+FN 139: [footnote-shortened-exact-title] Keys: [eraslan:2021, ey:2021] Text: Eraslan, Mâtürîdîlik ve Tasavvuf, 109.
+FN 140: [footnote-shortened-exact-title] Keys: [parsa:nodate, pm:nodate] Text: Muhammed Pârsa, Faslü’l-hitâb (Taşkent: Gulam Hasan Arifcanov Litografyası (Taş Baskı Atölyesi), ts.), 127.
+FN 141: [footnote-shortened-exact-title] Keys: [eraslan:2021, ey:2021] Text: Mâtürîdîlik ve Nakşîlik ilişkisi bu dönemden sonraki süreçte özellikle Hindistan bölgesinde daha belirgin bir şekilde devam etmiştir. Bkz. Eraslan, Mâtürîdîlik ve Tasavvuf, 109-110.
+FN 142: [footnote-fulltext] Keys: [tosun:2018, nt:2018] Text: Necdet Tosun, “Mâturdiyye ve Tasavvuf İlişkisi”, Uluslararası Maturidilik Sempozyumu (Dünü, Bugünü ve Geleceği): Bildiriler, (2018), 160.
+FN 143: [footnote-shortened-exact-title] Keys: [hodgson:1995, hm:1995] Text: Hodgson, İslam’ın Serüveni, 2/544.
+FN 144: [footnote-fulltext] Keys: [tosun:2007, nt:2007] Text: Necdet Tosun, “Nurbahşiyye”, Türkiye Diyanet Vakfı İslâm Ansiklopedisi (İstanbul: TDV Yayınları, 2007), 33/249.
+FN 145: [footnote-shortened-exact-title] Keys: [manz:2013, mbf:2013] Text: Manz, Timurlu İran’ında İktidar, Siyaset ve Din, 232.
+FN 146: [footnote-fulltext] Keys: [ihtilaf:2020, mucadele:2020] Text: Doğuşundan günümüze tasavvufa dair tartışmalar : on üç asırlık ihtilaf ve mücadele. (Ankara : Türk Tarih Kurumu, 2020), 27.
+FN 147: [footnote-fulltext] Keys: [tosun:2018, nt:2018] Text: Necdet Tosun, “Mâturdiyye ve Tasavvuf İlişkisi”, Uluslararası Maturidilik Sempozyumu (Dünü, Bugünü ve Geleceği): Bildiriler, (2018), 157-163.
+
+=== UNRESOLVED FOOTNOTES (Total: 0) ===

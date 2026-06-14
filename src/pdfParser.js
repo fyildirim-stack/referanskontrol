@@ -51,17 +51,41 @@ export async function extractTextFromPdf(file) {
 
     // Sort lines from top to bottom (y descending in PDF coordinate space)
     const sortedY = Array.from(linesMap.keys()).sort((a, b) => b - a);
-    const pageLines = sortedY.map((y) => {
+    const pageLines = [];
+    for (const y of sortedY) {
       const lineItems = linesMap.get(y);
       // Sort items in a line from left to right (x ascending, x is transform[4])
       lineItems.sort((a, b) => a.transform[4] - b.transform[4]);
-      const minX = lineItems[0] ? lineItems[0].transform[4] : 0;
-      return {
-        text: lineItems.map((item) => item.str).join(" "),
-        minX: minX,
-        y: y
-      };
-    });
+
+      // Split into sub-lines if there's a large horizontal gap (column gutter)
+      const subLines = [[]];
+      for (let j = 0; j < lineItems.length; j++) {
+        if (j > 0) {
+          const prevItem = lineItems[j - 1];
+          const prevEnd = prevItem.transform[4] + (prevItem.width || 0);
+          const curStart = lineItems[j].transform[4];
+          const gap = curStart - prevEnd;
+          if (gap > 50) {
+            // Large gap detected — start a new sub-line
+            subLines.push([]);
+          }
+        }
+        subLines[subLines.length - 1].push(lineItems[j]);
+      }
+
+      for (const subLineItems of subLines) {
+        if (subLineItems.length === 0) continue;
+        const minX = subLineItems[0].transform[4];
+        const lastItem = subLineItems[subLineItems.length - 1];
+        const maxX = lastItem.transform[4] + (lastItem.width || 0);
+        pageLines.push({
+          text: subLineItems.map((item) => item.str).join(" "),
+          minX: minX,
+          maxX: maxX,
+          y: y
+        });
+      }
+    }
 
     pages.push({
       pageNumber: i,
@@ -72,4 +96,39 @@ export async function extractTextFromPdf(file) {
   return pages;
 }
 
-// PDF parsing helper module
+/**
+ * Extract text content from a PDF file as a single string
+ * @param {File|Blob|ArrayBuffer} file
+ * @returns {Promise<string>}
+ */
+export async function readPdfFile(file) {
+  const pages = await extractTextFromPdf(file);
+  return pages
+    .map(page => page.lines.map(line => line.text).join('\n'))
+    .join('\n\n');
+}
+
+/**
+ * Extract bibliography section from PDF text
+ * @param {string} text - Full PDF text
+ * @returns {string|null}
+ */
+export function parsePdfBibliography(text) {
+  if (!text) return null;
+
+  const headerPatterns = [
+    /(?:^|\n)\s*(Kaynakça|Kaynaklar|References|Bibliography|Referanslar)\s*\n/im,
+  ];
+
+  for (const pattern of headerPatterns) {
+    const match = text.match(pattern);
+    if (match) {
+      const startIndex = match.index + match[0].length;
+      const bibText = text.substring(startIndex).trim();
+      if (bibText.length > 10) return bibText;
+    }
+  }
+
+  return null;
+}
+

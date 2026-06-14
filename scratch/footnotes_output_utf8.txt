@@ -1,0 +1,209 @@
+Total footnote citations: 51
+Missing footnote citations: 9
+Unresolved footnote citations: 4
+
+=== ALL FOOTNOTE CITATIONS ===
+ID: 1 | Kind: footnote-fulltext
+Text: "Yunus Berkli – Vali Mahboubi, “Hüsn-i Hat ve Cami Mimarisine Katkıları”, Current Perspectives in Social Sciences 26/2 (2022), 216-222."
+Keys: [berkli:2022, mahboubi:2022, ybvm:2022]
+---------------------------------------
+ID: 2 | Kind: footnote-fulltext
+Text: "Muhittin Serin, Hat Sanatı ve Meşhur Hattatlar (İstanbul: Kubbealtı Akademisi Kültür ve Sanat Vakfı, 1999), 57."
+Keys: [serin:1999, sanatı:1999, hattatlar:1999, mshsmh:1999]
+---------------------------------------
+ID: 3 | Kind: footnote-fulltext
+Text: "Uğur Derman, “Hat”, Türkiye Diyanet Vakfı İslâm Ansiklopedisi (İstanbul: TDV Yayınları, 1997), 427."
+Keys: [derman:1997, ud:1997]
+---------------------------------------
+ID: 4 | Kind: footnote-fulltext
+Text: "Uğur Derman, “Hat”, Türkiye Diyanet Vakfı İslâm Ansiklopedisi (İstanbul: TDV Yayınları, 1997), 427."
+Keys: [derman:1997, ud:1997]
+---------------------------------------
+ID: 5 | Kind: footnote-fulltext
+Text: "Muhittin Serin, Hat Sanatı ve Meşhur Hattatlar (İstanbul: Kubbealtı Akademisi Kültür ve Sanat Vakfı, 1999), 23."
+Keys: [serin:1999, sanatı:1999, hattatlar:1999, mshsmh:1999]
+---------------------------------------
+ID: 6 | Kind: footnote-fulltext
+Text: "Mehmet Memiş, “Osmanlıda Hat Sanatını Zirveye Çıkaran Eğitim Yöntemi: Meşk ve İcazet Geleneği”, INJOSOS Al-Farabi International Journal on Social Sciences / Al-Farabi Uluslararası Sosyal Bilimler Dergisi 2/3 (2018), 54."
+Keys: [memis:2018, mm:2018]
+---------------------------------------
+ID: 7 | Kind: footnote-fulltext
+Text: "Mustafa Diğler- Seçkin Aydın, “Hüsn-i Hat ve Mimarimizdeki Yeri”, 38. ICANAS: Uluslararası Asya ve Kuzey Afrika Çalışmaları Kongresi, 10-15 Eylül 2007, Ankara, Bildiriler, Maddi Kültür (Ankara: Atatürk Kültür, Dil ve Tarih Yüksek Kurumu, 2008), 1/449."
+Keys: [digler:2008, aydın:2008, mdsa:2008]
+---------------------------------------
+ID: 8 | Kind: footnote-fulltext
+Text: "Murat Sülün, “Din ve Hayat”, TDV İstanbul Müftülüğü Dergisi 3 (2007), 95."
+Keys: [sulun:2007, ms:2007]
+---------------------------------------
+ID: 9 | Kind: footnote-fulltext
+Text: "Süleyman Berk, Eski Camilerin Kaybolan Güzelliklerinden Biri: Hüsn-i Hat Levhaları”, İslam Medeniyeti Araştırmaları Dergisi 3/1 (Haziran 2018), 98-100."
+Keys: [berk:2018, levhala:2018, sbeckgbhhl:2018]
+---------------------------------------
+ID: 10 | Kind: footnote-unresolved
+Text: "“Mescidler şüphesiz Allah’ındır, öyleyse oralarda Allah’a yalvarırken başkasını katmayın”."
+Keys: []
+---------------------------------------
+ID: 11 | Kind: footnote-unresolved
+Text: "“Allah, rabbimizdir.”"
+Keys: []
+---------------------------------------
+ID: 12 | Kind: footnote-unresolved
+Text: "“Muhammed nebîmizdir.”"
+Keys: []
+---------------------------------------
+ID: 13 | Kind: footnote-fulltext
+Text: "Süleyman Berk, Eski Camilerin Kaybolan Güzelliklerinden Biri: Hüsn-i Hat Levhaları”, İslam Medeniyeti Araştırmaları Dergisi 3/1 (Haziran 2018), 99."
+Keys: [berk:2018, levhala:2018, sbeckgbhhl:2018]
+---------------------------------------
+ID: 14 | Kind: footnote-fulltext
+Text: "Hasan Uyanık, Hat Sanatının Kaynakçası (Yüksek Lisans Tezi, Gazi Üniversitesi Eğitim Bilimleri Enstit., 2009), 1."
+Keys: [uyanık:2009, kaynakcası:2009, huhsk:2009]
+---------------------------------------
+ID: 15 | Kind: footnote-fulltext
+Text: "Nurullah Yılmaz, “Kur’ân’ın İçeriksel Açıdan İslam Hat Sanatına Etkisi”, Balıkesir İlahiyat Dergisi 17 (Haziran 2023), 135; Seyyid Hüseyin Nasr, İslam Sanatı ve Maneviyatı, çev. Ahmet Demirhan (İstanbul: İnsan Yayınları, 2017), 30."
+Keys: [yılmaz:2023, ny:2023, nasr:2017, sanatı:2017, maneviyatı:2017, cev:2017, shnism:2017]
+---------------------------------------
+ID: 16 | Kind: footnote-fulltext
+Text: "Nurullah Yılmaz, “Kur’ân’ın İçeriksel Açıdan İslam Hat Sanatına Etkisi”, Balıkesir İlahiyat Dergisi 17 (Haziran 2023), 135; Özgür Çetintaş, “Ankara Alaeddin Cami Kitabelerinin Hat Sanatı Yönünden İncelenmesi”, Atatürk Üniversitesi Güzel Sanatlar Enstitüsü Dergisi 43 (2019), 198."
+Keys: [yılmaz:2023, ny:2023, cetintas:2019, oc:2019]
+---------------------------------------
+ID: 17 | Kind: footnote-fulltext
+Text: "Mustafa Sürün, “Lâleli Külliyesi Hat Düzeni (Kitabe ve Yazıların Değerlendirilmesi)”, İslam Tetkikleri Dergisi- Journal of Islamic Review 12/2 (2022), 372-375."
+Keys: [surun:2022, ms:2022]
+---------------------------------------
+ID: 18 | Kind: footnote-fulltext
+Text: "Ahmet Emir Yılmaz, “Görsel Öğrenme Aracı Olarak İnfografikler: Eğitimdeki Rolü ve Önemi”, The Journal of Open Learning and Distance Education 3 (2024), 14; Furkan Atan - Hüseyin Kocasaraç, “Dijital Öğrenme-Öğretme Araçları”, Medeniyet Eğitim Araştırmaları Dergisi 6/2 (Aralık 2022), 1; İnci Pürlüsoy- Gülçin Cankız Elibol, “İlkokul Eğitim Mekânlarında Mekânsal İhtiyaçların Eğitim Yaklaşımları Açısından Araştırılması”, Mimarlık Bilimleri ve Uygulamaları Dergisi 7/1 (Temmuz 2022), 190; Serhat Anıktar, Yeni Nesil İlkokullarda Öğrenme Ortamları Tasarım Destek Kılavuzu (İstanbul: Yıldız Teknik Üniversitesi, Fen Bilimleri Enstitüsü, Doktora Tezi, 2017), 17."
+Keys: [yılmaz:2024, aey:2024, atan:2022, kocasarac:2022, fahk:2022, purlusoy:2022, elibol:2022, ipgce:2022, anıktar:2017, kılavuz:2017, sayniootdk:2017]
+---------------------------------------
+ID: 19 | Kind: footnote-fulltext
+Text: "Mustafa Ağırman, “İslâm Medeniyetinde Câmi: Camilerin Sosyal ve Kültürel Fonksiyonları”, Değişen Dünyada Cami ve Fonksiyonları, ed. Ahmet Bostacı vd. (İstanbul: Ravza Yayınları, 2022), 43-53."
+Keys: [agırman:2022, ma:2022]
+---------------------------------------
+ID: 20 | Kind: footnote-fulltext
+Text: "Nesimi Yazıcı, “Bir Eğitim-Öğretim Kurumu Olarak Cami”, Cami Yazıları, tsh. İsmail Derin (Ankara: Diyanet İşleri Başkanlığı Yayınları, 2012), 21."
+Keys: [yazıcı:2012, ny:2012]
+---------------------------------------
+ID: 21 | Kind: footnote-inline
+Text: "Ahmet Güner, “Asr-ı Saâdet’te Mescidler/Camiler ve Fonksiyonları”, Bütün Yönleriyle Asr-ı Saâdet’te İslâm, c. 4 (İstanbul, 1995), 155-211; Ahmet Önkal, “Asr-ı Saadet’te Mescid’in Önemi ve Yaptığı Görevler”, Diyanet Dergisi 19/3 (Ankara, 1983), 49-55; Kazıcı, Ziya. “Tarih Boyunca Cami ve Gördüğü Hizmetler”. Diyanet Dergisi 22/4 (1986), 8-10."
+Keys: [istanbul:1995, onkal:1983, ao:1983, kazıcı:1986, ziya:1986, kz:1986]
+---------------------------------------
+ID: 22 | Kind: footnote-shortened
+Text: "Nesimi Yazıcı, “Bir Eğitim-Öğretim Kurumu Olarak Cami”,"
+Keys: [yazıcı:2012, nesimi:2012, yn:2012]
+---------------------------------------
+ID: 23 | Kind: footnote-fulltext
+Text: "Mehmet Şener, “Cami- Dinî Hükümler”, Türkiye Diyanet Vakfı İslâm Ansiklopedisi, c. 7 (İstanbul: TDV Yayınları, 1993), 91."
+Keys: [sener:1993, ms:1993]
+---------------------------------------
+ID: 24 | Kind: footnote-fulltext
+Text: "Ali Fuat Baysal, “Geçmişten Günümüze Cami Tezyinatı”, TİDSAD (Türk & İslam Dünyası Sosyal Araştırmalar Dergisi) 5/19 (Aralık 2018), 18; Aliya İzzetbegoviç, Doğu ile Batı Arasında İslâm (İstanbul: Klasik Yayınları, 2011), 133."
+Keys: [baysal:2018, afb:2018, izzetbegovic:2011, islam:2011, aidbai:2011]
+---------------------------------------
+ID: 25 | Kind: footnote-fulltext
+Text: "Murat Sülün, “Mabed, Mimari ve Estetik”, Cami Yazıları, tsh. İsmail Derin (Ankara: Diyanet İşleri Başkanlığı Yayınları, 2012), 183."
+Keys: [sulun:2012, ms:2012]
+---------------------------------------
+ID: 26 | Kind: footnote-shortened
+Text: "Murat Sülün, “Mabed, Mimari ve Estetik”,186-187."
+Keys: [sulun:2012, murat:2012, sm:2012]
+---------------------------------------
+ID: 27 | Kind: footnote-shortened
+Text: "Murat Sülün, “Mabed, Mimari ve Estetik”,186-187."
+Keys: [sulun:2012, murat:2012, sm:2012]
+---------------------------------------
+ID: 28 | Kind: footnote-shortened
+Text: "Murat Sülün, “Mabed, Mimari ve Estetik”,189-192"
+Keys: [sulun:2012, murat:2012, sm:2012]
+---------------------------------------
+ID: 29 | Kind: footnote-fulltext
+Text: "Osman Şekerci, İslam’da Resim ve Heykelin Yeri (İstanbul: Çanakkale Seramik Fabrikaları Kültür ve Araştırma Hizmetleri Yayınları, 1974), 10; Çetintaş, Özgür. “Ankara Alaeddin Cami Kitabelerinin Hat Sanatı Yönünden İncelenmesi”. Atatürk Üniversitesi Güzel Sanatlar Enstitüsü Dergisi 43 (2019), 198."
+Keys: [sekerci:1974, resim:1974, yeri:1974, osirhy:1974, cetintas:2019, ozgur:2019, co:2019]
+---------------------------------------
+ID: 30 | Kind: footnote-fulltext
+Text: "Mustafa Fatih Ay, “Turizm Bölgelerinde Bir Cami Hizmeti Olarak Cami Rehberliği: Cami Rehberlerinin Eğitimi ve Personel Yeterlikleri İçin Bir Öneri”, Uluslararası Değişen Dünyada Cami ve Fonksiyonları Sempozyumu (7–9 Ekim 2022), ed. Ahmet Bostancı vd. (İstanbul: Ravza Yayınları, 2023), 127-139."
+Keys: [ay:2022, mfa:2022]
+---------------------------------------
+ID: 31 | Kind: footnote-fulltext
+Text: "Necdet Sakaoğlu, Osmanlı Eğitim Tarihi (İstanbul: İletişim Yayınları, 1993), 14."
+Keys: [sakaoglu:1993, tarihi:1993, nsoet:1993]
+---------------------------------------
+ID: 32 | Kind: footnote-shortened
+Text: "Ay, “Turizm Bölgelerinde Bir Cami Hizmeti Olarak Cami Rehberliği”, 127-128."
+Keys: [ay:2022, fatih:2022, amf:2022]
+---------------------------------------
+ID: 33 | Kind: footnote-shortened
+Text: "Hicabi Gülgen, “Bursa Ulu Cami Müezzin Mahfili ve Tezyinatı”, Uludağ Üniversitesi İlahiyat Fakültesi Dergisi 25/1 (20 16), 51."
+Keys: [gulgen:2016, hicabi:2016, gh:2016]
+---------------------------------------
+ID: 34 | Kind: footnote-fulltext
+Text: "Mustafa Kara, Bursa’da Dinî Kültür (Bursa: Emin Yayınları, 2011), 129."
+Keys: [kara:2011, kultur:2011, mkbdk:2011]
+---------------------------------------
+ID: 35 | Kind: footnote-shortened
+Text: "Karacabey, “Bursa UluCami’de Yer Alan Hadisler”, 99."
+Keys: [karacabey:2011, salih:2011, ks:2011]
+---------------------------------------
+ID: 36 | Kind: footnote-shortened
+Text: "Bursa Valiliği, “UluCami; Osmanlı İmparatorluğu Döneminde Yapılmış Bütün Camilerin Atası” (Erişim 10.01. 2026)."
+Keys: [valiligi:2026, bv:2026, erisim:2026, oidybca:2026]
+---------------------------------------
+ID: 37 | Kind: footnote-fulltext
+Text: "Salih Karacabey, “Muhteva, Sıhhat ve Mesajları Açısından Bursa UluCami’de Yer Alan Hadisler”, Uludağ Üniversitesi İlahiyat FakültesDergisi 20/2 (Haziran 2011),99."
+Keys: [karacabey:2011, sk:2011]
+---------------------------------------
+ID: 38 | Kind: footnote-shortened
+Text: "Bursa Valiliği, “UluCami; Osmanlı İmparatorluğu Döneminde Yapılmış Bütün Camilerin Atası” (Erişim: 10.01.2026)."
+Keys: [valiligi:2026, bv:2026, erisim:2026, oidybca:2026]
+---------------------------------------
+ID: 39 | Kind: footnote-fulltext
+Text: "Doğan Yavaş, “UluCami”, Türkiye Diyanet Vakfı İslâm Ansiklopedisi (İstanbul: TDV Yayınları, 2012), 42/88-89."
+Keys: [yavas:2012, dy:2012]
+---------------------------------------
+ID: 40 | Kind: footnote-shortened
+Text: "Bursa Valiliği, “UluCami; Osmanlı İmparatorluğu Döneminde Yapılmış Bütün Camilerin Atası” (Erişim: 10.01.2026); Kazım Baykal, Bursa ve Anıtları, 3. bs. (Bursa: A.Ç. Vakfı, 1993), 100-102."
+Keys: [valiligi:2026, bv:2026, erisim:2026, oidybca:2026, baykal:1993, bursa:1993, anıtları:1993, bs:1993, kbba:1993]
+---------------------------------------
+ID: 41 | Kind: footnote-fulltext
+Text: "Bursa Haber, “Bursalı Rehberlere UluCami’de Hat Sanatı Eğitimi” (Erişim 18.01.2026)."
+Keys: [haber:2026, bh:2026]
+---------------------------------------
+ID: 42 | Kind: footnote-shortened
+Text: "Karacabey, “Bursa UluCami’de Yer Alan Hadisler”, 101."
+Keys: [karacabey:2011, salih:2011, ks:2011]
+---------------------------------------
+ID: 43 | Kind: footnote-shortened
+Text: "Karacabey, “Bursa UluCami’de Yer Alan Hadisler”, 101-103"
+Keys: [karacabey:2011, salih:2011, ks:2011]
+---------------------------------------
+ID: 44 | Kind: footnote-fulltext
+Text: "Kazım Baykal, Bursa’da UluCami (İstanbul: İbrahim Horoz Basımevi, 1950), 148-149, 75, 73-74."
+Keys: [baykal:1950, ulucami:1950, kbbu:1950]
+---------------------------------------
+ID: 45 | Kind: footnote-shortened
+Text: "Karacabey, “Bursa UluCami’de Yer Alan Hadisler”, 103-104."
+Keys: [karacabey:2011, salih:2011, ks:2011]
+---------------------------------------
+ID: 46 | Kind: footnote-fulltext
+Text: "Özgür Çetintaş, “Türk-İslam Mimarisinde Yazı ve Süsleme Özellikleri: Anadolu Selçuklu Dönemi (Usta Şagird Kümbeti Örneği), ” Turkish Studies 14/7 (Aralık 2019), 3699-3711, 3703-3704; Karacabey, “Uludağ Üniversitesi İlahiyat Fakültesi Dergisi,” 103-104."
+Keys: [cetintas:2019, oc:2019]
+---------------------------------------
+ID: 47 | Kind: footnote-fulltext
+Text: "Diyanet Haber, “Bursa’nın simgesi UluCami’deki hat eserleri dijital ortama aktarıldı” (Erişim 07.05.2025); Anadolu Ajansı, “Bursa’nın Simgesi UluCami’deki Hat Eserleri Dijital Ortama Aktarıldı” (Erişim 23.01. 2026)."
+Keys: [haber:2025, dh:2025, ajansı:2026, aa:2026]
+---------------------------------------
+ID: 48 | Kind: footnote-inline
+Text: "Dariyadi, Moch Wahib vd., “Arabic Calligraphy as Mosque Decoration: Architectural Significance in Indonesia, ” City, Territory and Architecture (2025) (Erişim: 24 Ocak 2026)."
+Keys: [territoryandarchitecture:2025]
+---------------------------------------
+ID: 49 | Kind: footnote-fulltext
+Text: "Zafer Şık, “Anadolu’da UluCami Geleneği: Selçuklu, Beylikler ve Osmanlı Dönemlerinde Mekânsal ve İçtimâî Merkez Olarak Rolü”, Yedi Aralık Sosyal Araştırmalar Dergisi 4/2 (Aralık 2025), 22."
+Keys: [sık:2025, zs:2025]
+---------------------------------------
+ID: 50 | Kind: footnote-fulltext
+Text: "Mustafa Yıldırım- Kasım Kara, “Bursa UluCami Mihrap Yazıları,” Journal of Education and Society 4/12 (Şubat 2015): 30–31."
+Keys: [yıldırım:2015, kara:2015, mykk:2015]
+---------------------------------------
+ID: 51 | Kind: footnote-fulltext
+Text: "Bursa UluCami, “Hüsnü-Hat Teşhirgahı” (Erişim 24.01 2026)."
+Keys: [ulucami:2026, teshirgahı:2026, but:2026]
+---------------------------------------

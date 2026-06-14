@@ -84,11 +84,68 @@ export function getActualAuthorSegment(text, yearMatch) {
   return text.slice(0, 80).trim();
 }
 
+export function cleanUrlsInText(text) {
+  if (!text) return "";
+  let normalized = text.replace(/(https?:\/\/)\s+/gi, "$1");
+  let result = "";
+  let i = 0;
+  while (i < normalized.length) {
+    if (normalized.slice(i).match(/^(https?:\/\/|www\.)/i)) {
+      const match = normalized.slice(i).match(/^(https?:\/\/|www\.)/i);
+      let urlStr = match[0];
+      i += match[0].length;
+      let tempIdx = i;
+      while (tempIdx < normalized.length) {
+        const char = normalized[tempIdx];
+        if (/\s/.test(char)) {
+          const rest = normalized.slice(tempIdx).trim();
+          if (
+            rest.startsWith("(Erişim") ||
+            rest.startsWith("(Access") ||
+            rest.startsWith("(accessed") ||
+            rest.startsWith("Erişim") ||
+            rest.startsWith("Access") ||
+            /^\((?:19|20)\d{2}\)/.test(rest) ||
+            /^[A-Z]/.test(rest.replace(/^\.\s*/, ""))
+          ) {
+            break;
+          }
+          tempIdx++;
+          continue;
+        }
+        if (char === '.' || char === ',' || char === ')') {
+          const rest = normalized.slice(tempIdx + 1).trim();
+          if (
+            rest.startsWith("(Erişim") ||
+            rest.startsWith("(Access") ||
+            rest.startsWith("(accessed") ||
+            rest.startsWith("Erişim") ||
+            rest.startsWith("Access") ||
+            char === ')' ||
+            /^[A-Z]/.test(rest)
+          ) {
+            break;
+          }
+        }
+        urlStr += char;
+        tempIdx++;
+      }
+      result += urlStr;
+      i = tempIdx;
+    } else {
+      result += normalized[i];
+      i++;
+    }
+  }
+  return result;
+}
+
 export function parseReference(text, paragraphIndex) {
-  const yearMatch = findYearInReference(text);
+  const cleanedText = cleanUrlsInText(text);
+  const yearMatch = findYearInReference(cleanedText);
   let year = "nodate";
   let dateText = "t.y.";
-  let yearIndex = text.length;
+  let yearIndex = cleanedText.length;
   let yearMatchText = "";
 
   if (yearMatch) {
@@ -98,7 +155,7 @@ export function parseReference(text, paragraphIndex) {
     yearMatchText = yearMatch[0];
   }
 
-  const authorSegment = getActualAuthorSegment(text, yearMatch || { index: yearIndex });
+  const authorSegment = getActualAuthorSegment(cleanedText, yearMatch || { index: yearIndex });
   const authors = parseAuthorNames(authorSegment);
   if (!authors.length) return null;
 
@@ -106,17 +163,17 @@ export function parseReference(text, paragraphIndex) {
   let container = "";
 
   const quoteRegex = /[“"‘«']([^”"’»']+)[”"’»']/;
-  const quoteMatch = text.match(quoteRegex);
+  const quoteMatch = cleanedText.match(quoteRegex);
   const isApasque = yearMatch && yearMatch[0] && yearMatch[0].startsWith("(") && yearMatch.index < 250;
 
   const cleanRegex1 = /(?:Erişim(?:\s+Tarihi)?|Accessed(?:\s+Date)?)[\s:]*\d{1,2}[./-]\d{1,2}[./-]\d{2,4}/gi;
   const cleanRegex2 = /(?:Erişim(?:\s+Tarihi)?|Accessed(?:\s+Date)?)[\s:]*\d{1,2}\s+\p{L}+\s+\d{2,4}/giu;
-  const accessMatch = text.match(cleanRegex1) || text.match(cleanRegex2);
+  const accessMatch = cleanedText.match(cleanRegex1) || cleanedText.match(cleanRegex2);
   const accessDate = accessMatch ? accessMatch[0].trim() : "";
 
   if (quoteMatch) {
     title = quoteMatch[1].trim();
-    const afterQuote = text.slice(quoteMatch.index + quoteMatch[0].length).trim();
+    const afterQuote = cleanedText.slice(quoteMatch.index + quoteMatch[0].length).trim();
     container = afterQuote
       .replace(yearMatchText, "")
       .replace(/https?:\/\/\S+/gi, "")
@@ -127,7 +184,7 @@ export function parseReference(text, paragraphIndex) {
       .trim();
   } else {
     if (isApasque) {
-      const afterDate = String(text.slice(yearMatch.index + yearMatch[0].length)).replace(/[ \t\r\n]+/g, " ").trim().replace(/^\.\s*/, "");
+      const afterDate = String(cleanedText.slice(yearMatch.index + yearMatch[0].length)).replace(/[ \t\r\n]+/g, " ").trim().replace(/^\.\s*/, "");
       const withoutUrl = String(afterDate.replace(/https?:\/\/\S+/gi, ""))
         .replace(cleanRegex1, "")
         .replace(cleanRegex2, "")
@@ -139,7 +196,7 @@ export function parseReference(text, paragraphIndex) {
       title = titleSplit.title;
       container = titleSplit.container;
     } else {
-      const afterAuthor = text.slice(authorSegment.length).trim().replace(/^\.\s*/, "");
+      const afterAuthor = cleanedText.slice(authorSegment.length).trim().replace(/^\.\s*/, "");
       const cleanAfterAuthor = afterAuthor
         .replace(yearMatchText, "")
         .replace(cleanRegex1, "")
@@ -160,9 +217,9 @@ export function parseReference(text, paragraphIndex) {
   title = title.replace(/^[.,\s“"‘«]+|[.,\s”"’»]+$/g, "").trim();
   container = container.replace(/^[.,\s]+|[.,\s]+$/g, "").trim();
 
-  const url = text.match(/https?:\/\/\S+/i)?.[0]?.replace(/[).,]+$/g, "") || "";
-  const doi = text.match(/https?:\/\/doi\.org\/\S+/i)?.[0]?.replace(/[).,]+$/g, "") || "";
-  const isChapter = /\b(?:İçinde|In)\b/i.test(text) && !doi && !url;
+  const url = cleanedText.match(/https?:\/\/\S+/i)?.[0]?.replace(/[).,]+$/g, "") || "";
+  const doi = cleanedText.match(/https?:\/\/doi\.org\/\S+/i)?.[0]?.replace(/[).,]+$/g, "") || "";
+  const isChapter = /\b(?:İçinde|In)\b/i.test(cleanedText) && !doi && !url;
   const type = (doi || /\b\d+\s*\(\d+\)|\b\d+\/\d+|\bjournal|dergi|policy|reviews?|energy policy\b/i.test(container)) ? "article" : (url ? "web" : (isChapter ? "chapter" : "book"));
 
   let publisher = "";
@@ -175,7 +232,7 @@ export function parseReference(text, paragraphIndex) {
   }
 
   const structured = {
-    raw: text,
+    raw: cleanedText,
     authors,
     authorText: authors.map((author) => author.full).join(" - ") || authorSegment,
     bibliographyAuthorText: formatBibliographyAuthors(authors, authorSegment),
@@ -191,11 +248,29 @@ export function parseReference(text, paragraphIndex) {
     accessDate,
   };
 
-  const authorKeys = extractReferenceAuthors(authorSegment);
-  const keys = [...new Set([...authorKeys.map((author) => makeKey(author, year)), ...extractReferenceAliases(authorSegment, year)])];
+  const keys = [];
+  authors.forEach((author) => {
+    const familyKey = makeKey(author.family, year);
+    if (!keys.includes(familyKey)) keys.push(familyKey);
+
+    const authorAliases = getAuthorAliases(author.full, year);
+    authorAliases.forEach((alias) => {
+      if (!keys.includes(alias)) keys.push(alias);
+    });
+
+    const corporateKeywords = /\b(?:commission|union|organization|bakanl[ıi][gğ][ıi]|m[üu]d[üu]rl[üu][gğ][üu]|kurum|enstit[üu]|vak[fıi]|dernek|t\.?c\.?|united nations|world bank|oecd|imf|who|unicef|eurostat|council|agency|office|department|society|association|university|universite|grup|group|committee|assembly|parliament|goverment|hükümet|türk|turk|mill[ıi]|milli|devlet|bakanlar|birli[gğ][iı]|ajans[ıi]?|bundesamt)\b/i;
+    if (!corporateKeywords.test(author.family)) {
+      const words = author.family.replace(/[^\p{L}'-]/gu, " ").trim().split(/\s+/).filter(Boolean);
+      if (words.length > 1) {
+        const lastWord = words[words.length - 1];
+        const lastWordKey = makeKey(lastWord, year);
+        if (!keys.includes(lastWordKey)) keys.push(lastWordKey);
+      }
+    }
+  });
 
   return {
-    display: text,
+    display: cleanedText,
     paragraphIndex,
     keys,
     structured,
@@ -203,6 +278,7 @@ export function parseReference(text, paragraphIndex) {
     isnadBibliography: formatIsnadBibliography(structured),
   };
 }
+
 
 export function parseApaReference(text, authorSegment, yearMatch) {
   const year = yearMatch[1];
@@ -259,7 +335,7 @@ export function splitTitleAndContainer(text) {
     };
   }
 
-  const rawParts = text.split(/(?<=\.)\s+(?=\p{Lu}|\d)/u).map((part) => part.trim()).filter(Boolean);
+  const rawParts = text.split(/(?<!\b[sp]|pp|ed|eds|vol|no|çev|trans|haz)\.\s+(?=\p{Lu}|\d)/iu).map((part) => part.trim()).filter(Boolean);
   if (!rawParts.length) return { title: text, container: "" };
   
   const parts = [];
@@ -300,12 +376,17 @@ export function normalizeInitials(given) {
 export function parseAuthorNames(authorSegment) {
   const cleanSegment = authorSegment.replace(/[.,\s]+$/, "");
   
-  const blocks = cleanSegment
+  // Protect ve/and/& inside parentheses from being used as split points
+  const protectedSegment = cleanSegment.replace(/\([^)]*\)/g, (match) =>
+    match.replace(/\bve\b/gi, '\x00VE\x00').replace(/\band\b/gi, '\x00AND\x00').replace(/&/g, '\x00AMP\x00')
+  );
+  const blocks = protectedSegment
     .split(/\s*(?:,\s*&|,\s*\band\b|,\s*\bve\b|\b&\b|\band\b|\bve\b|[\u2013\u2014]|\s+-\s*|\s*-\s+)\s*/iu)
+    .map(b => b.replace(/\x00VE\x00/g, 've').replace(/\x00AND\x00/g, 'and').replace(/\x00AMP\x00/g, '&'))
     .map(b => b.trim())
     .filter(Boolean);
 
-  const corporateKeywords = /\b(?:commission|union|organization|bakanl[ıi]g[ıi]|m[üu]d[üu]rl[üu]g[üu]|kurum|enstit[üu]|vak[fıi]|dernek|t\.?c\.?|united nations|world bank|oecd|imf|who|unicef|eurostat|council|agency|office|department|society|association|university|universite|grup|group|committee|assembly|parliament|goverment|hükümet|türk|turk|mill[ıi]|milli|devlet|bakanlar)\b/i;
+  const corporateKeywords = /\b(?:commission|union|organization|bakanl[ıi][gğ][ıi]|m[üu]d[üu]rl[üu][gğ][üu]|kurum|enstit[üu]|vak[fıi]|dernek|t\.?c\.?|united nations|world bank|oecd|imf|who|unicef|eurostat|council|agency|office|department|society|association|university|universite|grup|group|committee|assembly|parliament|goverment|hükümet|türk|turk|mill[ıi]|milli|devlet|bakanlar|birli[gğ][iı]|ajans[ıi]?|bundesamt)\b/i;
 
   const authors = [];
   for (const block of blocks) {
@@ -383,14 +464,18 @@ export function extractReferenceAuthors(authorSegment) {
   return parseAuthorNames(authorSegment).map(a => a.family).filter(Boolean);
 }
 
-export function extractReferenceAliases(authorSegment, year) {
+export function getAuthorAliases(authorName, year) {
   const aliases = [];
-  const explicitAcronyms = [...authorSegment.matchAll(/\(([A-ZÇĞİÖŞÜ&.\s-]{2,})\)/gu)].map((match) => match[1].replace(/[\s.]/g, ""));
+  const explicitAcronyms = [...authorName.matchAll(/\(([A-ZÇĞİÖŞÜ&.\s-]{2,})\)/gu)].map((match) => match[1].replace(/[\s.]/g, ""));
   explicitAcronyms.forEach((alias) => {
     if (alias.length >= 2) aliases.push(makeKey(alias, year));
   });
 
-  const withoutParentheses = authorSegment.replace(/\([^)]*\)/g, "").replace(/[.]+$/g, "").trim();
+  const withoutParentheses = authorName.replace(/\([^)]*\)/g, "").replace(/[.]+$/g, "").trim();
+  if (/^[A-ZÇĞİÖŞÜ]{2,10}$/u.test(withoutParentheses)) {
+    aliases.push(makeKey(withoutParentheses, year));
+  }
+
   if (!withoutParentheses.includes(",")) {
     const acronym = withoutParentheses
       .split(/\s+/)
@@ -398,6 +483,22 @@ export function extractReferenceAliases(authorSegment, year) {
       .join("");
     if (acronym.length >= 2) aliases.push(makeKey(acronym, year));
   }
+  return aliases;
+}
+
+export function extractReferenceAliases(authorSegment, year) {
+  const parts = authorSegment
+    .split(/\s*(?:,\s*&|,\s*\band\b|,\s*\bve\b|\b&\b|\band\b|\bve\b|[\u2013\u2014]|\s+-\s*|\s*-\s+)\s*/iu)
+    .flatMap(p => p.split(/\s*,\s*/))
+    .map(p => p.trim())
+    .filter(Boolean);
+
+  const aliases = [];
+  parts.forEach(part => {
+    getAuthorAliases(part, year).forEach(alias => {
+      if (!aliases.includes(alias)) aliases.push(alias);
+    });
+  });
   return aliases;
 }
 
@@ -443,8 +544,7 @@ export function formatIsnadBibliography(item) {
 export function buildIsnadBibliography(references) {
   return [...references]
     .map((reference) => reference.isnadBibliography || formatIsnadBibliography(reference.structured))
-    .filter(Boolean)
-    .sort((a, b) => a.localeCompare(b, "tr"));
+    .filter(Boolean);
 }
 
 export function formatDateText(dateText) {
@@ -501,7 +601,7 @@ export function extractPublisherAndPlaceFromContainer(container, type) {
   if (!container) return { publisher: "", place: "", cleanContainer: "" };
   const clean = container.replace(/[.]+$/g, "").trim();
   
-  const partsByDot = clean.split(/\.\s+/);
+  const partsByDot = clean.split(/(?<!\b[sp]|pp|ed|eds|vol|no|çev|trans|haz)\.\s+/iu);
   if (partsByDot.length > 1) {
     const lastPart = partsByDot[partsByDot.length - 1];
     const pubInfo = parsePublisherAndPlace(lastPart);

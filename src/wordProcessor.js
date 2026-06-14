@@ -40,8 +40,9 @@ export async function analyzeDocx(file) {
   const citations = bodyParagraphs.flatMap((paragraph) => findCitations(paragraph.text, paragraph.index));
   const referenceEntries = buildReferenceEntries(referenceParagraphs);
   const references = referenceEntries.map((entry) => parseReference(entry.text, entry.paragraphIndex)).filter(Boolean);
+
   const referenceKeys = new Set(references.flatMap((reference) => reference.keys));
-  const missing = citations.filter((citation) => !citation.keys.some((key) => referenceKeys.has(key)));
+  const missing = citations.filter((citation) => !isCitationMatched(citation.keys, referenceKeys, references));
   const missingUnique = groupMissingCitations(missing);
 
   // Process footnotes
@@ -67,7 +68,7 @@ export async function analyzeDocx(file) {
   });
 
   const missingFootnoteCitations = footnoteParts.filter(
-    (fp) => fp.keys.length > 0 && !fp.keys.some((key) => referenceKeys.has(key))
+    (fp) => fp.keys.length > 0 && !isCitationMatched(fp.keys, referenceKeys, references)
   );
   const unresolvedFootnoteCitations = footnoteParts.filter((fp) => fp.keys.length === 0);
   const missingFootnoteUnique = groupMissingCitations(
@@ -183,6 +184,182 @@ function isReferencesHeading(text) {
 
 function findReferencesStartRobust(paragraphs) {
   return paragraphs.findIndex((paragraph) => isReferencesHeading(paragraph.text));
+}
+
+function filterRunningHeaders(lines) {
+  if (lines.length < 5) return lines;
+
+  // Helper: strip leading/trailing page numbers for fuzzy header matching
+  const normalizeForHeaderMatch = (text) =>
+    text.trim().replace(/^\d{1,4}\s+/, "").replace(/\s+\d{1,4}$/, "").trim();
+
+  // 1) Detect exact-text repeats across 3+ pages (running header/footer)
+  const textPageMap = new Map();
+  const fuzzyPageMap = new Map();
+  lines.forEach(l => {
+    const t = l.text.trim();
+    if (t.length < 3) return;
+    // Exact match
+    if (!textPageMap.has(t)) textPageMap.set(t, new Set());
+    textPageMap.get(t).add(l.pageNumber);
+    // Fuzzy match (strip page numbers)
+    const fuzzy = normalizeForHeaderMatch(t);
+    if (fuzzy.length >= 5) {
+      if (!fuzzyPageMap.has(fuzzy)) fuzzyPageMap.set(fuzzy, new Set());
+      fuzzyPageMap.get(fuzzy).add(l.pageNumber);
+    }
+  });
+  const repeatedTexts = new Set();
+  for (const [t, pages] of textPageMap.entries()) {
+    if (pages.size >= 3) repeatedTexts.add(t);
+  }
+  const repeatedFuzzyTexts = new Set();
+  for (const [t, pages] of fuzzyPageMap.entries()) {
+    if (pages.size >= 3) repeatedFuzzyTexts.add(t);
+  }
+
+  // 2) Detect isolated top/bottom lines per page (gap-based)
+  const byPage = new Map();
+  lines.forEach(l => {
+    if (!byPage.has(l.pageNumber)) byPage.set(l.pageNumber, []);
+    byPage.get(l.pageNumber).push(l);
+  });
+
+  const isolatedSet = new Set();
+  for (const [, pageLines] of byPage.entries()) {
+    if (pageLines.length < 4) continue;
+    const sorted = [...pageLines].sort((a, b) => b.y - a.y);
+
+    // Compute content gaps (skip first 2 lines for the median)
+    const contentGaps = [];
+    for (let i = 3; i < sorted.length; i++) {
+      const g = sorted[i - 1].y - sorted[i].y;
+      if (g > 3 && g < 50) contentGaps.push(g);
+    }
+    if (contentGaps.length === 0) continue;
+    contentGaps.sort((a, b) => a - b);
+    const typicalGap = contentGaps[Math.floor(contentGaps.length / 2)];
+
+    // Top line isolated check
+    const topGap = sorted[0].y - sorted[1].y;
+    if (topGap > typicalGap * 2 && !isReferenceStart(sorted[0].text)) {
+      isolatedSet.add(sorted[0]);
+    }
+
+    // Top two lines forming a header block — if they are both isolated
+    // from the content, filter them unconditionally (even if they pass
+    // isReferenceStart, because real references do not float above the
+    // bibliography body with a large gap).
+    if (sorted.length > 2) {
+      const secondGap = sorted[1].y - sorted[2].y;
+      if (secondGap > typicalGap * 2.5) {
+        isolatedSet.add(sorted[0]);
+        isolatedSet.add(sorted[1]);
+      }
+    }
+
+    // Bottom footer / page number
+    if (sorted.length > 2) {
+      const bottomGap = sorted[sorted.length - 2].y - sorted[sorted.length - 1].y;
+      if (bottomGap > typicalGap * 2.5 && /^\d{1,4}$/.test(sorted[sorted.length - 1].text.trim())) {
+        isolatedSet.add(sorted[sorted.length - 1]);
+      }
+    }
+  }
+
+  return lines.filter(l => {
+    const t = l.text.trim();
+    if (repeatedTexts.has(t)) return false;
+    if (repeatedFuzzyTexts.has(normalizeForHeaderMatch(t))) return false;
+    if (isolatedSet.has(l)) return false;
+    if (/^\d{1,4}$/.test(t)) return false;
+    return true;
+  });
+}
+
+function reorderColumnsInBibLines(bibLines) {
+  if (bibLines.length < 3) return bibLines;
+
+  // Group lines by page
+  const byPage = new Map();
+  bibLines.forEach(l => {
+    if (!byPage.has(l.pageNumber)) byPage.set(l.pageNumber, []);
+    byPage.get(l.pageNumber).push(l);
+  });
+
+  // Detect consistent gutter across pages
+  let detectedMidX = 0;
+  let detectedPages = 0;
+
+  for (const [, pageLines] of byPage.entries()) {
+    if (pageLines.length < 3) continue;
+
+    // Group lines at same y-level
+    const yGroups = new Map();
+    for (const line of pageLines) {
+      let foundY = null;
+      for (const existingY of yGroups.keys()) {
+        if (Math.abs(existingY - line.y) < 6) {
+          foundY = existingY;
+          break;
+        }
+      }
+      if (foundY !== null) {
+        yGroups.get(foundY).push(line);
+      } else {
+        yGroups.set(line.y, [line]);
+      }
+    }
+
+    // Lines at same y-level with 2+ items → two-column candidate
+    const gutterCandidates = [];
+    for (const [, group] of yGroups.entries()) {
+      if (group.length >= 2) {
+        group.sort((a, b) => a.minX - b.minX);
+        for (let j = 0; j < group.length - 1; j++) {
+          const leftEnd = group[j].maxX || (group[j].minX + 200);
+          const rightStart = group[j + 1].minX;
+          const gap = rightStart - leftEnd;
+          if (gap > 20) {
+            gutterCandidates.push((leftEnd + rightStart) / 2);
+          }
+        }
+      }
+    }
+
+    if (gutterCandidates.length >= 2) {
+      gutterCandidates.sort((a, b) => a - b);
+      const median = gutterCandidates[Math.floor(gutterCandidates.length / 2)];
+      detectedMidX = (detectedMidX * detectedPages + median) / (detectedPages + 1);
+      detectedPages++;
+    }
+  }
+
+  if (detectedPages === 0) return bibLines;
+
+  // Reorder: for each page, split lines into left/right columns,
+  // then output left-top-to-bottom, right-top-to-bottom
+  const result = [];
+  for (const [, pageLines] of byPage.entries()) {
+    const leftLines = [];
+    const rightLines = [];
+
+    for (const line of pageLines) {
+      const center = (line.minX + (line.maxX || line.minX + 100)) / 2;
+      if (center < detectedMidX) {
+        leftLines.push(line);
+      } else {
+        rightLines.push(line);
+      }
+    }
+
+    leftLines.sort((a, b) => b.y - a.y);
+    rightLines.sort((a, b) => b.y - a.y);
+
+    result.push(...leftLines, ...rightLines);
+  }
+
+  return result;
 }
 
 function buildReferenceLookup(references) {
@@ -313,6 +490,7 @@ export async function analyzePdf(file) {
         allLines.push({
           text: line.text.trim(),
           minX: line.minX,
+          maxX: line.maxX || 0,
           y: line.y,
           pageNumber: page.pageNumber,
         });
@@ -323,7 +501,9 @@ export async function analyzePdf(file) {
   const headingIndex = allLines.findIndex(l => isReferencesHeading(l.text));
   
   const bodyLines = headingIndex === -1 ? allLines : allLines.slice(0, headingIndex);
-  const bibLines = headingIndex === -1 ? [] : allLines.slice(headingIndex + 1);
+  let bibLines = headingIndex === -1 ? [] : allLines.slice(headingIndex + 1);
+  bibLines = filterRunningHeaders(bibLines);
+  bibLines = reorderColumnsInBibLines(bibLines);
 
   // Reconstruct body paragraphs
   const bodyParagraphs = [];
@@ -346,7 +526,11 @@ export async function analyzePdf(file) {
     }
     
     if (shouldMerge) {
-      if (currentBody.text.endsWith("-")) {
+      const lastWord = currentBody.text.split(/\s+/).at(-1) || "";
+      const isUrlHyphen = currentBody.text.endsWith("-") && (lastWord.includes("/") || lastWord.includes("http") || lastWord.includes("www."));
+      if (isUrlHyphen) {
+        currentBody.text += line.text;
+      } else if (currentBody.text.endsWith("-")) {
         currentBody.text = currentBody.text.slice(0, -1) + line.text;
       } else {
         currentBody.text += " " + line.text;
@@ -362,13 +546,44 @@ export async function analyzePdf(file) {
     bodyParagraphs.push(currentBody);
   }
 
+  // Group bibLines by page
+  const bibLinesByPage = new Map();
+  bibLines.forEach(l => {
+    if (!bibLinesByPage.has(l.pageNumber)) {
+      bibLinesByPage.set(l.pageNumber, []);
+    }
+    bibLinesByPage.get(l.pageNumber).push(l);
+  });
+
+  const pageBaseMargins = new Map();
+  const pageLineSpacings = new Map();
+  const pageHangingIndentFlags = new Map();
+
+  for (const [pageNum, lines] of bibLinesByPage.entries()) {
+    const longLines = lines.filter(l => l.text.length > 15);
+    const baseMargin = longLines.length > 0 ? Math.min(...longLines.map(l => l.minX)) : 50;
+    pageBaseMargins.set(pageNum, baseMargin);
+
+    const gaps = [];
+    for (let i = 1; i < lines.length; i++) {
+      const gap = lines[i - 1].y - lines[i].y;
+      if (gap > 5 && gap < 30) {
+        gaps.push(gap);
+      }
+    }
+    gaps.sort((a, b) => a - b);
+    const standardSpacing = gaps.length > 0 ? gaps[Math.floor(gaps.length / 2)] : 12;
+    pageLineSpacings.set(pageNum, standardSpacing);
+
+    const indentedCount = lines.filter(l => l.minX > baseMargin + 5).length;
+    const hasHangingIndent = lines.length > 0 && (indentedCount / lines.length > 0.25);
+    pageHangingIndentFlags.set(pageNum, hasHangingIndent);
+  }
+
   // Reconstruct bibliography paragraphs
   const bibParagraphs = [];
   let currentBib = null;
   let bibIdx = 0;
-  
-  const nonShortBibLines = bibLines.filter(l => l.text.length > 10);
-  const baseMargin = nonShortBibLines.length > 0 ? Math.min(...nonShortBibLines.map(l => l.minX)) : 60;
 
   for (let i = 0; i < bibLines.length; i++) {
     const line = bibLines[i];
@@ -376,13 +591,56 @@ export async function analyzePdf(file) {
       currentBib = { text: line.text, pageNumber: line.pageNumber };
       continue;
     }
-    
+
     const cleanText = line.text.trim();
     const startsWithUrl = /^https?:\/\//i.test(cleanText);
-    const startsWithAccessDate = /^\((?:Erişim(?:\s+Tarihi)?|Access(?:\s+Date)?|Accessed)/i.test(cleanText);
-    const isContinuation = (line.minX > baseMargin + 5) || startsWithUrl || startsWithAccessDate;
+    const startsWithAccessDate = /^\((?:Erişim(?:\s+Tarihi)?|Access(?:\s+Date)?|Accessed|Son\s+Erişim)/i.test(cleanText);
+
+    const prevLine = bibLines[i - 1];
+    const isSamePage = prevLine.pageNumber === line.pageNumber;
+    const pageBaseMargin = pageBaseMargins.get(line.pageNumber) || 50;
+    const pageLineSpacing = pageLineSpacings.get(line.pageNumber) || 12;
+    const hasHangingIndent = pageHangingIndentFlags.get(line.pageNumber) || false;
+
+    const isIndented = line.minX > pageBaseMargin + 4;
+    const verticalGap = isSamePage ? (prevLine.y - line.y) : 999;
+    const isTightSpacing = isSamePage && (verticalGap <= pageLineSpacing + 3);
+
+    let isContinuation = false;
+    const endsWithHyphen = currentBib.text.endsWith("-");
+    const firstLetterMatch = cleanText.match(/\p{L}/u);
+    const startsWithLowercase = firstLetterMatch && 
+                                firstLetterMatch[0] === firstLetterMatch[0].toLowerCase() && 
+                                firstLetterMatch[0] !== firstLetterMatch[0].toUpperCase();
+
+    const yearMatchInCurrent = findYearInReference(currentBib.text);
+    let currentEndsWithYear = false;
+    if (yearMatchInCurrent) {
+      const indexAfterYear = yearMatchInCurrent.index + yearMatchInCurrent[0].length;
+      const textAfterYear = currentBib.text.slice(indexAfterYear).trim();
+      if (textAfterYear.length < 5) {
+        currentEndsWithYear = true;
+      }
+    }
+
+    if (endsWithHyphen || startsWithUrl || startsWithAccessDate || startsWithLowercase || currentEndsWithYear) {
+      isContinuation = true;
+    } else if (isSamePage) {
+      if (hasHangingIndent) {
+        isContinuation = isIndented || !isReferenceStart(cleanText);
+      } else {
+        isContinuation = !isReferenceStart(cleanText);
+      }
+    } else {
+      isContinuation = !isReferenceStart(cleanText);
+    }
+
     if (isContinuation) {
-      if (currentBib.text.endsWith("-")) {
+      const lastWord = currentBib.text.split(/\s+/).at(-1) || "";
+      const isUrlHyphen = currentBib.text.endsWith("-") && (lastWord.includes("/") || lastWord.includes("http") || lastWord.includes("www."));
+      if (isUrlHyphen) {
+        currentBib.text += line.text;
+      } else if (currentBib.text.endsWith("-")) {
         currentBib.text = currentBib.text.slice(0, -1) + line.text;
       } else {
         currentBib.text += " " + line.text;
@@ -438,8 +696,9 @@ export async function analyzePdf(file) {
   // Bibliography references
   const referenceEntries = buildReferenceEntries(referenceParagraphs);
   const references = referenceEntries.map((entry) => parseReference(entry.text, entry.paragraphIndex)).filter(Boolean);
+
   const referenceKeys = new Set(references.flatMap((reference) => reference.keys));
-  const missing = citations.filter((citation) => !citation.keys.some((key) => referenceKeys.has(key)));
+  const missing = citations.filter((citation) => !isCitationMatched(citation.keys, referenceKeys, references));
   const missingUnique = groupMissingCitations(missing);
 
   // Extract footnotes from PDF body
@@ -487,7 +746,7 @@ export async function analyzePdf(file) {
   });
 
   const missingFootnoteCitations = footnoteParts.filter(
-    (fp) => fp.keys.length > 0 && !fp.keys.some((key) => referenceKeys.has(key))
+    (fp) => fp.keys.length > 0 && !isCitationMatched(fp.keys, referenceKeys, references)
   );
   const unresolvedFootnoteCitations = footnoteParts.filter((fp) => fp.keys.length === 0);
   
@@ -526,3 +785,8 @@ export async function analyzePdf(file) {
     paragraphs: paragraphs.map(({ index, text, pageNumber }) => ({ index, text, pageNumber })),
   };
 }
+
+export function isCitationMatched(citationKeys, referenceKeys, references) {
+  return citationKeys.some(key => referenceKeys.has(key));
+}
+

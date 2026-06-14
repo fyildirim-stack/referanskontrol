@@ -30,10 +30,17 @@ export function findCitations(text, paragraphIndex) {
     const rangeEnd = match.index + match[0].length;
     if (occupied.some(([start, end]) => rangeStart >= start && rangeStart < end)) continue;
     const display = `${match[1]} (${match[2]})`;
+    const authors = extractCitationAuthors(match[1]);
+    const keys = [];
+    authors.forEach((author) => {
+      getAuthorKeys(author, match[2]).forEach((k) => {
+        if (!keys.includes(k)) keys.push(k);
+      });
+    });
     matches.push({
       kind: "narrative",
       display,
-      keys: [makeKey(match[1], match[2])],
+      keys,
       paragraphIndex,
       start: rangeStart,
       end: rangeEnd,
@@ -59,7 +66,30 @@ export function parseCitationPart(part) {
   if (!authorPart || !isPlausibleCitationAuthorPart(authorPart)) return null;
   const authors = extractCitationAuthors(authorPart);
   if (!authors.length) return null;
-  return { keys: authors.map((author) => makeKey(author, yearMatch[1])) };
+  const keys = [];
+  authors.forEach((author) => {
+    getAuthorKeys(author, yearMatch[1]).forEach((k) => {
+      if (!keys.includes(k)) keys.push(k);
+    });
+  });
+  return { keys };
+}
+
+export function getAuthorKeys(author, year) {
+  const corporateKeywords = /\b(?:commission|union|organization|bakanl[ıi]g[ıi]|m[üu]d[üu]rl[üu]g[üu]|kurum|enstit[üu]|vak[fıi]|dernek|t\.?c\.?|united nations|world bank|oecd|imf|who|unicef|eurostat|council|agency|office|department|society|association|university|universite|grup|group|committee|assembly|parliament|goverment|hükümet|türk|turk|mill[ıi]|milli|devlet|bakanlar|birlig[ıi]|ajans[ıi]?)\b/i;
+  const normalizedYear = normalizeYear(year);
+  const primaryKey = makeKey(author, normalizedYear);
+  if (corporateKeywords.test(author)) {
+    return [primaryKey];
+  }
+  const cleaned = author.replace(/[^\p{L}'-]/gu, " ").trim();
+  const words = cleaned.split(/\s+/).filter(Boolean);
+  if (words.length > 1) {
+    const lastWord = words[words.length - 1];
+    const lastWordKey = makeKey(lastWord, normalizedYear);
+    return [primaryKey, lastWordKey];
+  }
+  return [primaryKey];
 }
 
 function foldTurkish(str) {
@@ -97,7 +127,23 @@ export function makeKey(author, year) {
 }
 
 export function cleanAuthor(value) {
-  return value.replace(/[()]/g, "").replace(/\b(?:et al|vd)\.?/giu, "").replace(/[^\p{L}'-]/gu, " ").trim().split(/\s+/).at(-1) || "";
+  const corporateKeywords = /\b(?:commission|union|organization|bakanl[ıi]g[ıi]|m[üu]d[üu]rl[üu]g[üu]|kurum|enstit[üu]|vak[fıi]|dernek|t\.?c\.?|united nations|world bank|oecd|imf|who|unicef|eurostat|council|agency|office|department|society|association|university|universite|grup|group|committee|assembly|parliament|goverment|hükümet|türk|turk|mill[ıi]|milli|devlet|bakanlar|birlig[ıi]|ajans[ıi]?)\b/i;
+  const cleaned = value.replace(/[()]/g, "").replace(/\b(?:et al|vd)\.?/giu, "").replace(/[^\p{L}'-]/gu, " ").trim();
+  if (corporateKeywords.test(cleaned)) {
+    return cleaned;
+  }
+  const words = cleaned.split(/\s+/).filter(Boolean);
+  let startIdx = 0;
+  while (startIdx < words.length - 1) {
+    const word = words[startIdx];
+    const isInitial = word.replace(/[.]/g, "").length === 1;
+    if (isInitial) {
+      startIdx++;
+    } else {
+      break;
+    }
+  }
+  return words.slice(startIdx).join(" ");
 }
 
 export function normalize(value) {
