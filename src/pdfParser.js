@@ -126,13 +126,13 @@ function formatPageToMarkdown(page) {
 
     // Detect headings (all caps, or section numbers like "1. Introduction")
     const isHeading = 
-      (text.length > 3 && text.length < 100 && text === text.toUpperCase() && !/^\\d+$/.test(text)) ||
-      (/^\\d+(\\.\\d+)*\\s+[A-ZÇĞİÖŞÜa-zçğıöşü]/.test(text) && text.length < 80) ||
-      /^(Kaynakça|Kaynaklar|References|Bibliography|Referanslar)/i.test(text);
+      (text.length > 3 && text.length < 100 && text === text.toUpperCase() && !/^\d+$/.test(text)) ||
+      (/^\d+(\.\d+)*\s+[A-ZÇĞİÖŞÜa-zçğıöşü]/.test(text) && text.length < 80) ||
+      /^(Kaynakça|Kaynaklar|References|Bibliography|Referanslar|Ekler|Ek\s+\d+|Appendix|Appendices)/i.test(text);
 
     // Detect and discard running headers/footers or page numbers
     const isFirstOrLast = i === 0 || i === lines.length - 1;
-    const isPageNumber = /^\\d+$/.test(text);
+    const isPageNumber = /^\d+$/.test(text);
     const isHeaderFooter = isFirstOrLast && text.length < 25 && !isHeading;
 
     if (isPageNumber || isHeaderFooter) {
@@ -225,14 +225,20 @@ export function parsePdfBibliography(text) {
   if (!text) return null;
 
   const headerPatterns = [
-    /(?:^|\n)\s*(?:#+\s*)?(Kaynakça|Kaynaklar|References|Bibliography|Referanslar)\s*\n/im,
+    /(?:^|\\n)\\s*(?:#+\\s*)?(Kaynakça|Kaynaklar|References|Bibliography|Referanslar)\\s*\\n/im,
   ];
 
   for (const pattern of headerPatterns) {
     const match = text.match(pattern);
     if (match) {
       const startIndex = match.index + match[0].length;
-      const bibText = text.substring(startIndex).trim();
+      let bibText = text.substring(startIndex).trim();
+      
+      const endMatch = bibText.match(/(?:^|\\n)\\s*(?:#+\\s*)?(EKLER|EK\\s+\\d+|APPENDIX|APPENDICES)\\b/im);
+      if (endMatch) {
+         bibText = bibText.substring(0, endMatch.index).trim();
+      }
+
       if (bibText.length > 10) return bibText;
     }
   }

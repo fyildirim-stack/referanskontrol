@@ -1,16 +1,25 @@
 import { test } from 'vitest';
 import fs from 'fs';
-import { analyzePdf } from './wordProcessor.js';
+import { readPdfFile, parsePdfBibliography } from './pdfParser.js';
+import { parseReferences } from './services/referenceParser.js';
 
 test('print OECD references from full analysis', async () => {
-  const filePath = "C:\\Users\\Fatih YILDIRIM\\Downloads\\10.25064-mulkiye.1809607-5356829.pdf";
+  const filePath = "C:\\\\Users\\\\Fatih YILDIRIM\\\\Downloads\\\\10.17244-eku.1750481-5089233.pdf";
   const fileBuffer = fs.readFileSync(filePath);
-  const result = await analyzePdf(fileBuffer);
+  const text = await readPdfFile(fileBuffer);
+  const bib = parsePdfBibliography(text);
   
-  console.log("=== OECD REFERENCES ===");
-  result.references.forEach((r, idx) => {
-    if (r.structured.raw.includes("OECD")) {
-      console.log(`${idx}: Keys: [${r.keys.join(', ')}] | Raw: "${r.structured.raw}"`);
-    }
+  if (!bib) {
+    console.log("No bibliography found!");
+    return;
+  }
+  
+  console.log("=== EXTRACTED BIBLIOGRAPHY TEXT ===");
+  console.log(bib);
+  
+  const refs = parseReferences(bib);
+  console.log("\\n=== PARSED REFERENCES ===");
+  refs.forEach((r, idx) => {
+    console.log(`${idx + 1}. [${r.authors.join(', ')} (${r.year})] ${r.title.substring(0, 50)}...`);
   });
 });

@@ -199,14 +199,20 @@ export function extractBibliographySection(fullText) {
   if (!fullText) return null;
 
   const patterns = [
-    /(?:^|\n)\s*(?:#+\s*)?(Kaynakça|Kaynaklar|References|Bibliography|Referanslar)\s*\n/im,
+    /(?:^|\\n)\\s*(?:#+\\s*)?(Kaynakça|Kaynaklar|References|Bibliography|Referanslar)\\s*\\n/im,
   ];
 
   for (const pattern of patterns) {
     const match = fullText.match(pattern);
     if (match) {
       const startIndex = match.index + match[0].length;
-      return fullText.substring(startIndex).trim();
+      let bibText = fullText.substring(startIndex).trim();
+      
+      const endMatch = bibText.match(/(?:^|\\n)\\s*(?:#+\\s*)?(EKLER|EK\\s+\\d+|APPENDIX|APPENDICES)\\b/im);
+      if (endMatch) {
+         bibText = bibText.substring(0, endMatch.index).trim();
+      }
+      return bibText;
     }
   }
 
