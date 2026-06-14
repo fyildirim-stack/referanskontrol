@@ -10,9 +10,9 @@
 export function parseTxtBibliography(text) {
   if (!text || typeof text !== 'string') return null;
 
-  // Search for bibliography header
+  // Search for bibliography header (supports optional markdown headings)
   const headerPatterns = [
-    /(?:^|\n)\s*(Kaynakça|Kaynaklar|References|Bibliography|Referanslar)\s*\n/im,
+    /(?:^|\n)\s*(?:#+\s*)?(Kaynakça|Kaynaklar|References|Bibliography|Referanslar)\s*\n/im,
   ];
 
   for (const pattern of headerPatterns) {

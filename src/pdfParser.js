@@ -97,27 +97,83 @@ export async function extractTextFromPdf(file) {
 }
 
 /**
- * Extract text content from a PDF file as a single string
+ * Format extracted page lines into structured Markdown representation, similar to MarkItDown
+ * Skips page numbers and running headers/footers, and formats headings and list items.
+ * @param {object} page - Page object with lines
+ * @returns {string} Markdown text for the page
+ */
+function formatPageToMarkdown(page) {
+  const mdLines = [];
+  const lines = page.lines;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const text = line.text.trim();
+    if (!text) continue;
+
+    // Detect headings (all caps, or section numbers like "1. Introduction")
+    const isHeading = 
+      (text.length > 3 && text.length < 100 && text === text.toUpperCase() && !/^\d+$/.test(text)) ||
+      (/^\d+(\.\d+)*\s+[A-ZÇĞİÖŞÜa-zçğıöşü]/.test(text) && text.length < 80) ||
+      /^(Kaynakça|Kaynaklar|References|Bibliography|Referanslar)/i.test(text);
+
+    // Detect and discard running headers/footers or page numbers
+    const isFirstOrLast = i === 0 || i === lines.length - 1;
+    const isPageNumber = /^\d+$/.test(text);
+    const isHeaderFooter = isFirstOrLast && text.length < 25 && !isHeading;
+
+    if (isPageNumber || isHeaderFooter) {
+      continue; // Skip running headers, footers, and page numbers
+    }
+
+    if (isHeading) {
+      mdLines.push(`\n## ${text}\n`);
+      continue;
+    }
+
+    // Detect lists (bullet points or numbered lists)
+    const isBulletList = /^[•⁃▪\-\*]\s+(.+)/.test(text);
+    const isNumberedList = /^\d+[\.\)]\s+(.+)/.test(text);
+
+    if (isBulletList) {
+      mdLines.push(`- ${text.replace(/^[•⁃▪\-\*]\s+/, '')}`);
+      continue;
+    }
+
+    if (isNumberedList) {
+      mdLines.push(text);
+      continue;
+    }
+
+    // Normal text line
+    mdLines.push(text);
+  }
+
+  return mdLines.join('\n');
+}
+
+/**
+ * Extract text content from a PDF file as a single string (in Markdown format)
  * @param {File|Blob|ArrayBuffer} file
  * @returns {Promise<string>}
  */
 export async function readPdfFile(file) {
   const pages = await extractTextFromPdf(file);
   return pages
-    .map(page => page.lines.map(line => line.text).join('\n'))
+    .map(page => formatPageToMarkdown(page))
     .join('\n\n');
 }
 
 /**
  * Extract bibliography section from PDF text
- * @param {string} text - Full PDF text
+ * @param {string} text - Full PDF text (supports Markdown format)
  * @returns {string|null}
  */
 export function parsePdfBibliography(text) {
   if (!text) return null;
 
   const headerPatterns = [
-    /(?:^|\n)\s*(Kaynakça|Kaynaklar|References|Bibliography|Referanslar)\s*\n/im,
+    /(?:^|\n)\s*(?:#+\s*)?(Kaynakça|Kaynaklar|References|Bibliography|Referanslar)\s*\n/im,
   ];
 
   for (const pattern of headerPatterns) {

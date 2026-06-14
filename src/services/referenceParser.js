@@ -11,9 +11,9 @@
 export function parseReferences(text) {
   if (!text || typeof text !== 'string') return [];
 
-  // Remove bibliography header
+  // Remove bibliography header (including optional markdown markers)
   const cleaned = text
-    .replace(/^(Kaynakça|Kaynaklar|References|Bibliography|Referanslar)\s*/im, '')
+    .replace(/^(?:#+\s*)?(Kaynakça|Kaynaklar|References|Bibliography|Referanslar)\s*/im, '')
     .trim();
 
   // Split by numbered references (1. Author...) or by double newlines or by line breaks that look like separate entries
@@ -35,27 +35,60 @@ function splitIntoEntries(text) {
     if (parts.length > 1) return parts.filter(p => p.trim());
   }
 
-  // Try splitting by blank lines
-  const byBlankLine = text.split(/\n\s*\n/);
-  if (byBlankLine.length > 1) return byBlankLine.filter(p => p.trim());
+  // Try splitting by blank lines to get blocks (e.g. page chunks in PDFs)
+  const blocks = text.split(/\n\s*\n/).filter(b => b.trim());
+  const authorPattern = /^(?:\d+[\.\)]\s*|\[\d+\]\s*)?[A-ZÇĞİÖŞÜa-zçğıöşü][a-zçğıöşü]+,\s*[A-ZÇĞİÖŞÜ]/;
 
-  // Fall back to splitting by lines that look like they start a new entry
-  // (start with an author name pattern: "Surname, I." or "Surname, Name")
-  const lines = text.split('\n').filter(l => l.trim());
   const entries = [];
-  let currentEntry = '';
+  for (const block of blocks) {
+    const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+    if (lines.length <= 1) {
+      if (block.trim()) entries.push(block.trim());
+      continue;
+    }
 
-  for (const line of lines) {
-    const trimmed = line.trim();
-    // Detect line starting with author pattern or number
-    if (/^(?:\d+[\.\)]\s*|\[\d+\]\s*)?[A-ZÇĞİÖŞÜa-zçğıöşü][a-zçğıöşü]+,\s*[A-ZÇĞİÖŞÜ]/.test(trimmed) && currentEntry) {
-      entries.push(currentEntry);
-      currentEntry = trimmed;
+    // Check if there is a line after the first one that starts with the author pattern
+    let hasMultipleRefs = false;
+    for (let i = 1; i < lines.length; i++) {
+      if (authorPattern.test(lines[i])) {
+        hasMultipleRefs = true;
+        break;
+      }
+    }
+
+    if (!hasMultipleRefs) {
+      entries.push(block.trim());
     } else {
-      currentEntry += (currentEntry ? ' ' : '') + trimmed;
+      // Split this block line-by-line using the author pattern
+      let currentEntry = '';
+      for (const line of lines) {
+        if (authorPattern.test(line) && currentEntry) {
+          entries.push(currentEntry.trim());
+          currentEntry = line;
+        } else {
+          currentEntry += (currentEntry ? ' ' : '') + line;
+        }
+      }
+      if (currentEntry) entries.push(currentEntry.trim());
     }
   }
-  if (currentEntry) entries.push(currentEntry);
+
+  // Fallback: if we didn't find any entries, try parsing the whole text line by line
+  if (entries.length <= 1) {
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+    let currentEntry = '';
+    const fallbackEntries = [];
+    for (const line of lines) {
+      if (authorPattern.test(line) && currentEntry) {
+        fallbackEntries.push(currentEntry.trim());
+        currentEntry = line;
+      } else {
+        currentEntry += (currentEntry ? ' ' : '') + line;
+      }
+    }
+    if (currentEntry) fallbackEntries.push(currentEntry.trim());
+    if (fallbackEntries.length > 0) return fallbackEntries;
+  }
 
   return entries;
 }
@@ -166,7 +199,7 @@ export function extractBibliographySection(fullText) {
   if (!fullText) return null;
 
   const patterns = [
-    /(?:^|\n)\s*(Kaynakça|Kaynaklar|References|Bibliography|Referanslar)\s*\n/im,
+    /(?:^|\n)\s*(?:#+\s*)?(Kaynakça|Kaynaklar|References|Bibliography|Referanslar)\s*\n/im,
   ];
 
   for (const pattern of patterns) {
