@@ -4,7 +4,6 @@
 
 import { searchOpenAlex } from './apis/openalexApi.js';
 import { searchCrossref } from './apis/crossrefApi.js';
-import { searchSemanticScholar } from './apis/semanticScholarApi.js';
 import { findBestMatch } from './matchScorer.js';
 
 /**
@@ -53,18 +52,16 @@ async function verifyOneReference(reference) {
     year: reference.year,
   };
 
-  // Search all APIs in parallel
-  const [openalexResults, crossrefResults, semanticResults] = await Promise.allSettled([
+  // Search CORS-enabled APIs in parallel
+  const [openalexResults, crossrefResults] = await Promise.allSettled([
     searchOpenAlex(searchParams),
     searchCrossref(searchParams),
-    searchSemanticScholar(searchParams),
   ]);
 
   // Collect all results
   const allResults = [
     ...(openalexResults.status === 'fulfilled' && openalexResults.value ? openalexResults.value : []),
     ...(crossrefResults.status === 'fulfilled' && crossrefResults.value ? crossrefResults.value : []),
-    ...(semanticResults.status === 'fulfilled' && semanticResults.value ? semanticResults.value : []),
   ];
 
   // Find best match across all results
@@ -89,7 +86,6 @@ async function verifyOneReference(reference) {
     searchedApis: [
       openalexResults.status === 'fulfilled' ? 'OpenAlex' : null,
       crossrefResults.status === 'fulfilled' ? 'Crossref' : null,
-      semanticResults.status === 'fulfilled' ? 'Semantic Scholar' : null,
     ].filter(Boolean),
     matchDetails: bestResult ? {
       source: bestResult.match.source,

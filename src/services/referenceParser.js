@@ -83,23 +83,29 @@ function parseEntry(text, index) {
     publisher: '',
   };
 
-  // Extract DOI
+  // Extract and remove DOI for cleaner parsing
+  let cleanedForParsing = cleaned;
   const doiMatch = cleaned.match(/(?:doi:\s*|https?:\/\/doi\.org\/)?(10\.\d{4,}\/[^\s,;]+)/i);
   if (doiMatch) {
     ref.doi = doiMatch[1].replace(/[\.\)]+$/, '');
+    cleanedForParsing = cleaned.replace(doiMatch[0], '').trim();
   }
 
+  // Clean trailing punctuation and spaces
+  cleanedForParsing = cleanedForParsing.replace(/[,\.\s\-–]+$/, '').trim();
+
   // Extract year
-  const yearMatch = cleaned.match(/\((\d{4})\)/);
+  const yearMatch = cleanedForParsing.match(/\((\d{4})\)/);
   if (yearMatch) {
     ref.year = parseInt(yearMatch[1]);
   } else {
-    const yearMatch2 = cleaned.match(/\b(19|20)\d{2}\b/);
+    const yearMatch2 = cleanedForParsing.match(/\b(19|20)\d{2}\b/);
     if (yearMatch2) ref.year = parseInt(yearMatch2[0]);
   }
 
   // Try APA style: Author, A. B. (Year). Title. Journal, Volume(Issue), Pages.
-  const apaMatch = cleaned.match(/^(.+?)\s*\((\d{4})\)\.\s*(.+?)(?:\.\s*(.+?))?(?:,\s*(\d+)(?:\((\d+)\))?,\s*([\d\-–]+))?/);
+  // Using end anchor ($) and removing DOI/trailing punctuation beforehand ensures correct title capture
+  const apaMatch = cleanedForParsing.match(/^(.+?)\s*\((\d{4})\)\.\s*(.+?)(?:\.\s*(.+?))?(?:,\s*(\d+)(?:\((\d+)\))?,\s*([\d\-–]+))?$/);
   if (apaMatch) {
     ref.authors = parseAuthors(apaMatch[1]);
     ref.year = parseInt(apaMatch[2]);
@@ -110,13 +116,13 @@ function parseEntry(text, index) {
     if (apaMatch[7]) ref.pages = apaMatch[7];
   } else {
     // Fallback: try to extract author and title more loosely
-    const parts = cleaned.split(/\.\s+/);
+    const parts = cleanedForParsing.split(/\.\s+/);
     if (parts.length >= 2) {
       ref.authors = parseAuthors(parts[0]);
       ref.title = cleanTitle(parts.length > 2 ? parts[1] : parts[1]);
       if (parts.length > 2) ref.journal = parts[2].replace(/\.\s*$/, '').trim();
     } else {
-      ref.title = cleanTitle(cleaned);
+      ref.title = cleanTitle(cleanedForParsing);
     }
   }
 
