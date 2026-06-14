@@ -37,7 +37,7 @@ function splitIntoEntries(text) {
 
   // Try splitting by blank lines to get blocks (e.g. page chunks in PDFs)
   const blocks = text.split(/\n\s*\n/).filter(b => b.trim());
-  const authorPattern = /^(?:\d+[\.\)]\s*|\[\d+\]\s*)?[A-ZÇĞİÖŞÜa-zçğıöşü][a-zçğıöşü]+,\s*[A-ZÇĞİÖŞÜ]/;
+  const authorPattern = /^(?:\d+[\.\)]\s*|\[\d+\]\s*)?[A-ZÇĞİÖŞÜ][a-zçğıöşüA-ZÇĞİÖŞÜ\s\-']+?,\s*[A-ZÇĞİÖŞÜ]/;
 
   const entries = [];
   for (const block of blocks) {

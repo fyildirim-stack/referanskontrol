@@ -106,6 +106,19 @@ function formatPageToMarkdown(page) {
   const mdLines = [];
   const lines = page.lines;
 
+  let currentParagraph = [];
+  let prevY = null;
+  let prevMinX = null;
+  
+  const authorPattern = /^(?:\\d+[\\.\\)]\\s*|\\[\\d+\\]\\s*)?[A-ZÇĞİÖŞÜ][a-zçğıöşüA-ZÇĞİÖŞÜ\\s\\-']+?,\\s*[A-ZÇĞİÖŞÜ]/;
+
+  const pushParagraph = () => {
+    if (currentParagraph.length > 0) {
+      mdLines.push(currentParagraph.join(' '));
+      currentParagraph = [];
+    }
+  };
+
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const text = line.text.trim();
@@ -113,13 +126,13 @@ function formatPageToMarkdown(page) {
 
     // Detect headings (all caps, or section numbers like "1. Introduction")
     const isHeading = 
-      (text.length > 3 && text.length < 100 && text === text.toUpperCase() && !/^\d+$/.test(text)) ||
-      (/^\d+(\.\d+)*\s+[A-ZÇĞİÖŞÜa-zçğıöşü]/.test(text) && text.length < 80) ||
+      (text.length > 3 && text.length < 100 && text === text.toUpperCase() && !/^\\d+$/.test(text)) ||
+      (/^\\d+(\\.\\d+)*\\s+[A-ZÇĞİÖŞÜa-zçğıöşü]/.test(text) && text.length < 80) ||
       /^(Kaynakça|Kaynaklar|References|Bibliography|Referanslar)/i.test(text);
 
     // Detect and discard running headers/footers or page numbers
     const isFirstOrLast = i === 0 || i === lines.length - 1;
-    const isPageNumber = /^\d+$/.test(text);
+    const isPageNumber = /^\\d+$/.test(text);
     const isHeaderFooter = isFirstOrLast && text.length < 25 && !isHeading;
 
     if (isPageNumber || isHeaderFooter) {
@@ -127,29 +140,68 @@ function formatPageToMarkdown(page) {
     }
 
     if (isHeading) {
-      mdLines.push(`\n## ${text}\n`);
+      pushParagraph();
+      mdLines.push(`\\n## ${text}\\n`);
+      prevY = null;
+      prevMinX = null;
       continue;
     }
 
     // Detect lists (bullet points or numbered lists)
-    const isBulletList = /^[•⁃▪\-\*]\s+(.+)/.test(text);
-    const isNumberedList = /^\d+[\.\)]\s+(.+)/.test(text);
+    const isBulletList = /^[•⁃▪\\-\\*]\\s+(.+)/.test(text);
+    const isNumberedList = /^\\d+[\\.\\)]\\s+(.+)/.test(text);
 
     if (isBulletList) {
-      mdLines.push(`- ${text.replace(/^[•⁃▪\-\*]\s+/, '')}`);
+      pushParagraph();
+      mdLines.push(`- ${text.replace(/^[•⁃▪\\-\\*]\\s+/, '')}`);
+      prevY = null;
+      prevMinX = null;
       continue;
     }
 
     if (isNumberedList) {
+      pushParagraph();
       mdLines.push(text);
+      prevY = null;
+      prevMinX = null;
       continue;
     }
 
     // Normal text line
-    mdLines.push(text);
-  }
+    let isNewParagraph = false;
+    if (currentParagraph.length > 0) {
+      const yGap = prevY !== null ? Math.abs(prevY - line.y) : 0;
+      
+      // Large vertical gap
+      if (yGap > 18) {
+        isNewParagraph = true;
+      } 
+      // Hanging indent return (current line returns to left margin after indented previous line)
+      else if (prevMinX !== null && line.minX < prevMinX - 8) {
+        isNewParagraph = true;
+      }
+      // Explicit first-line indent (current line is indented)
+      else if (prevMinX !== null && line.minX > prevMinX + 15 && text.length > 20) {
+        isNewParagraph = true;
+      }
+      // Looks like a new reference starting
+      else if (authorPattern.test(text)) {
+        isNewParagraph = true;
+      }
+    }
 
-  return mdLines.join('\n');
+    if (isNewParagraph) {
+      pushParagraph();
+    }
+
+    currentParagraph.push(text);
+    prevY = line.y;
+    prevMinX = line.minX;
+  }
+  
+  pushParagraph();
+
+  return mdLines.join('\\n\\n');
 }
 
 /**
