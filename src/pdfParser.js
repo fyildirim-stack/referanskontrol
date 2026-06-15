@@ -180,10 +180,6 @@ function formatPageToMarkdown(page) {
       else if (prevMinX !== null && line.minX < prevMinX - 8) {
         isNewParagraph = true;
       }
-      // Explicit first-line indent (current line is indented)
-      else if (prevMinX !== null && line.minX > prevMinX + 15 && text.length > 20) {
-        isNewParagraph = true;
-      }
       // Looks like a new reference starting
       else if (authorPattern.test(text)) {
         isNewParagraph = true;
