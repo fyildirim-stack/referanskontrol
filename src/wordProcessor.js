@@ -502,6 +502,15 @@ export async function analyzePdf(file) {
   
   const bodyLines = headingIndex === -1 ? allLines : allLines.slice(0, headingIndex);
   let bibLines = headingIndex === -1 ? [] : allLines.slice(headingIndex + 1);
+
+  // Truncate bibliography lines when hitting an Appendix/Ekler section
+  const appendixIndex = bibLines.findIndex(l => 
+    /^(EKLER|EK\s+\d+|APPENDIX|APPENDICES|Appendix|Appendices|Ekler)\b/i.test(l.text.trim())
+  );
+  if (appendixIndex !== -1) {
+    bibLines = bibLines.slice(0, appendixIndex);
+  }
+
   bibLines = filterRunningHeaders(bibLines);
   bibLines = reorderColumnsInBibLines(bibLines);
 

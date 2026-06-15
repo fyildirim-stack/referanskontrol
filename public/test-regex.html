@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Regex Diagnosis</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #1e1e1e; color: #f0f0f0; }
+    pre { background: #2d2d2d; padding: 15px; border-radius: 5px; overflow-x: auto; }
+    .success { color: #4caf50; font-weight: bold; }
+    .fail { color: #f44336; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Regex Diagnosis Dashboard</h1>
+  <div id="results">Running tests...</div>
+
+  <script>
+    const resultsDiv = document.getElementById('results');
+    let output = '';
+
+    function log(name, passed, detail) {
+      output += `<h3>Test: ${name} - ${passed ? '<span class="success">PASSED</span>' : '<span class="fail">FAILED</span>'}</h3>`;
+      output += `<pre>${detail}</pre>`;
+    }
+
+    try {
+      // Test 1: Simulating formatting and truncation
+      const sampleText = `Kaynakça\n\nAkpınar, B. (2024). Analiz. EKEV Akademi.\n\nYıldırım, A., & Şimşek, H. (2011). Sosyal bilimlerde nitel araştırma yöntemleri. Seçkin Publishing.\n\n## Appendix 1. List of Studies\n\nM1 Güç İlişkileri\n`;
+
+      const headerPatterns = [
+        /(?:^|\n)\s*(?:#+\s*)?(Kaynakça|Kaynaklar|References|Bibliography|Referanslar)\s*\n/im,
+      ];
+
+      let matchFound = false;
+      let bibText = '';
+      for (const pattern of headerPatterns) {
+        const match = sampleText.match(pattern);
+        if (match) {
+          matchFound = true;
+          const startIndex = match.index + match[0].length;
+          bibText = sampleText.substring(startIndex).trim();
+          break;
+        }
+      }
+
+      let truncated = false;
+      let truncatedText = bibText;
+      const endMatch = bibText.match(/(?:^|\n)\s*(?:#+\s*)?(EKLER|EK\s+\d+|APPENDIX|APPENDICES)\b/im);
+      if (endMatch) {
+        truncated = true;
+        truncatedText = bibText.substring(0, endMatch.index).trim();
+      }
+
+      log("Simple Appendix Truncation", matchFound && truncated, 
+          `Header Found: ${matchFound}\nTruncated: ${truncated}\nOriginal Length: ${bibText.length}\nTruncated Length: ${truncatedText.length}\nResult Content:\n${truncatedText}`);
+
+      // Test 2: Checking isHeading regex in pdfParser.js
+      const headingText = "Appendix 1. List of Studies";
+      const isHeading = 
+        (headingText.length > 3 && headingText.length < 100 && headingText === headingText.toUpperCase() && !/^\d+$/.test(headingText)) ||
+        (/^\d+(\.\d+)*\s+[A-ZÇĞİÖŞÜa-zçğıöşü]/.test(headingText) && headingText.length < 80) ||
+        /^(Kaynakça|Kaynaklar|References|Bibliography|Referanslar|Ekler|Ek\s+\d+|Appendix|Appendices)/i.test(headingText);
+
+      log("Heading Detection", isHeading, `Text: "${headingText}"\nisHeading: ${isHeading}`);
+
+    } catch (e) {
+      output += `<h2 class="fail">Error running tests: ${e.message}</h2><pre>${e.stack}</pre>`;
+    }
+
+    resultsDiv.innerHTML = output;
+  </script>
+</body>
+</html>
