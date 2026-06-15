@@ -37,7 +37,7 @@ function splitIntoEntries(text) {
 
   // Try splitting by blank lines to get blocks (e.g. page chunks in PDFs)
   const blocks = text.split(/\n\s*\n/).filter(b => b.trim());
-  const authorPattern = /^(?:\d+[\.\)]\s*|\[\d+\]\s*)?[A-ZÇĞİÖŞÜ][a-zçğıöşüA-ZÇĞİÖŞÜ\s\-']+?,\s*[A-ZÇĞİÖŞÜ]/;
+  const authorPattern = /^(?:\d+[\.\)]\s*|\[\d+\]\s*)?[A-ZÇĞİÖŞÜ][a-zA-ZçğıöşüÇĞİÖŞÜ\s'-]+?,\s*[A-ZÇĞİÖŞÜ]/;
 
   const entries = [];
   for (const block of blocks) {
@@ -199,7 +199,7 @@ export function extractBibliographySection(fullText) {
   if (!fullText) return null;
 
   const patterns = [
-    /(?:^|\\n)\\s*(?:#+\\s*)?(Kaynakça|Kaynaklar|References|Bibliography|Referanslar)\\s*\\n/im,
+    /(?:^|\n)\s*(?:#+\s*)?(Kaynakça|Kaynaklar|References|Bibliography|Referanslar)\s*\n/im,
   ];
 
   for (const pattern of patterns) {
@@ -208,7 +208,7 @@ export function extractBibliographySection(fullText) {
       const startIndex = match.index + match[0].length;
       let bibText = fullText.substring(startIndex).trim();
       
-      const endMatch = bibText.match(/(?:^|\\n)\\s*(?:#+\\s*)?(EKLER|EK\\s+\\d+|APPENDIX|APPENDICES)\\b/im);
+      const endMatch = bibText.match(/(?:^|\n)\s*(?:#+\s*)?(EKLER|EK\s+\d+|APPENDIX|APPENDICES)\b/im);
       if (endMatch) {
          bibText = bibText.substring(0, endMatch.index).trim();
       }

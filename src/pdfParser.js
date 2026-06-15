@@ -110,7 +110,7 @@ function formatPageToMarkdown(page) {
   let prevY = null;
   let prevMinX = null;
   
-  const authorPattern = /^(?:\\d+[\\.\\)]\\s*|\\[\\d+\\]\\s*)?[A-ZÇĞİÖŞÜ][a-zçğıöşüA-ZÇĞİÖŞÜ\\s\\-']+?,\\s*[A-ZÇĞİÖŞÜ]/;
+  const authorPattern = /^(?:\d+[\.\)]\s*|\[\d+\]\s*)?[A-ZÇĞİÖŞÜ][a-zA-ZçğıöşüÇĞİÖŞÜ\s'-]+?,\s*[A-ZÇĞİÖŞÜ]/;
 
   const pushParagraph = () => {
     if (currentParagraph.length > 0) {
@@ -141,19 +141,19 @@ function formatPageToMarkdown(page) {
 
     if (isHeading) {
       pushParagraph();
-      mdLines.push(`\\n## ${text}\\n`);
+      mdLines.push(`\n## ${text}\n`);
       prevY = null;
       prevMinX = null;
       continue;
     }
 
     // Detect lists (bullet points or numbered lists)
-    const isBulletList = /^[•⁃▪\\-\\*]\\s+(.+)/.test(text);
-    const isNumberedList = /^\\d+[\\.\\)]\\s+(.+)/.test(text);
+    const isBulletList = /^[•⁃▪\-*]\s+(.+)/.test(text);
+    const isNumberedList = /^\d+[\.\)]\s+(.+)/.test(text);
 
     if (isBulletList) {
       pushParagraph();
-      mdLines.push(`- ${text.replace(/^[•⁃▪\\-\\*]\\s+/, '')}`);
+      mdLines.push(`- ${text.replace(/^[•⁃▪\-*]\s+/, '')}`);
       prevY = null;
       prevMinX = null;
       continue;
@@ -201,7 +201,7 @@ function formatPageToMarkdown(page) {
   
   pushParagraph();
 
-  return mdLines.join('\\n\\n');
+  return mdLines.join('\n\n');
 }
 
 /**
@@ -225,7 +225,7 @@ export function parsePdfBibliography(text) {
   if (!text) return null;
 
   const headerPatterns = [
-    /(?:^|\\n)\\s*(?:#+\\s*)?(Kaynakça|Kaynaklar|References|Bibliography|Referanslar)\\s*\\n/im,
+    /(?:^|\n)\s*(?:#+\s*)?(Kaynakça|Kaynaklar|References|Bibliography|Referanslar)\s*\n/im,
   ];
 
   for (const pattern of headerPatterns) {
@@ -234,7 +234,7 @@ export function parsePdfBibliography(text) {
       const startIndex = match.index + match[0].length;
       let bibText = text.substring(startIndex).trim();
       
-      const endMatch = bibText.match(/(?:^|\\n)\\s*(?:#+\\s*)?(EKLER|EK\\s+\\d+|APPENDIX|APPENDICES)\\b/im);
+      const endMatch = bibText.match(/(?:^|\n)\s*(?:#+\s*)?(EKLER|EK\s+\d+|APPENDIX|APPENDICES)\b/im);
       if (endMatch) {
          bibText = bibText.substring(0, endMatch.index).trim();
       }
