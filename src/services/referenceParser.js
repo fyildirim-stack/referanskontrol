@@ -37,39 +37,63 @@ function splitIntoEntries(text) {
 
   // Try splitting by blank lines to get blocks (e.g. page chunks in PDFs)
   const blocks = text.split(/\n\s*\n/).filter(b => b.trim());
-  const authorPattern = /^(?:\d+[\.\)]\s*|\[\d+\]\s*)?[A-ZÇĞİÖŞÜ][a-zA-ZçğıöşüÇĞİÖŞÜ\s'-]+?,\s*[A-ZÇĞİÖŞÜ]/;
+  const numberPattern = /^(?:\d+[\.\)]\s*|\[\d+\]\s*)/;
+  // A 4-digit year in parentheses, e.g. (2024) or (2024a) — strong APA reference-start signal
+  const yearInParens = /\((?:19|20)\d{2}[a-z]?\)/;
+  // Strict author start: "Surname, A." — an initial (capital + period) after the comma.
+  // Avoids matching corporate continuations like "Directorate of Secondary Education, Ministry ..."
+  const strictAuthorStart = /^(?:\d+[\.\)]\s*|\[\d+\]\s*)?[A-ZÇĞİÖŞÜ][a-zA-ZçğıöşüÇĞİÖŞÜ.'’-]+(?:\s+[A-ZÇĞİÖŞÜ][a-zA-ZçğıöşüÇĞİÖŞÜ.'’-]+)*,\s*[A-ZÇĞİÖŞÜ]\./;
+  // A line begins a new reference if it starts with a number marker, a strict author name,
+  // or (capitalized line that contains a year in parentheses — covers corporate authors like MEB).
+  const startsNewReference = (line) =>
+    numberPattern.test(line) ||
+    strictAuthorStart.test(line) ||
+    (/^[A-ZÇĞİÖŞÜ]/.test(line) && yearInParens.test(line));
 
   const entries = [];
+  // Append a continuation block/fragment to the previous entry, or start a new one
+  const pushEntry = (text) => {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    if (entries.length > 0 && !startsNewReference(trimmed)) {
+      // Continuation of the previous reference (e.g. a multi-line / page-spanning entry)
+      entries[entries.length - 1] += ' ' + trimmed;
+    } else {
+      entries.push(trimmed);
+    }
+  };
+
   for (const block of blocks) {
     const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
     if (lines.length <= 1) {
-      if (block.trim()) entries.push(block.trim());
+      pushEntry(block);
       continue;
     }
 
-    // Check if there is a line after the first one that starts with the author pattern
+    // Check if there is a line after the first one that begins a new reference
     let hasMultipleRefs = false;
     for (let i = 1; i < lines.length; i++) {
-      if (authorPattern.test(lines[i])) {
+      if (startsNewReference(lines[i])) {
         hasMultipleRefs = true;
         break;
       }
     }
 
     if (!hasMultipleRefs) {
-      entries.push(block.trim());
+      pushEntry(block);
     } else {
-      // Split this block line-by-line using the author pattern
+      // Split this block line-by-line. Lines that don't start a new
+      // reference are merged into the current fragment.
       let currentEntry = '';
       for (const line of lines) {
-        if (authorPattern.test(line) && currentEntry) {
-          entries.push(currentEntry.trim());
+        if (startsNewReference(line) && currentEntry) {
+          pushEntry(currentEntry);
           currentEntry = line;
         } else {
           currentEntry += (currentEntry ? ' ' : '') + line;
         }
       }
-      if (currentEntry) entries.push(currentEntry.trim());
+      if (currentEntry) pushEntry(currentEntry);
     }
   }
 
@@ -79,7 +103,7 @@ function splitIntoEntries(text) {
     let currentEntry = '';
     const fallbackEntries = [];
     for (const line of lines) {
-      if (authorPattern.test(line) && currentEntry) {
+      if (startsNewReference(line) && currentEntry) {
         fallbackEntries.push(currentEntry.trim());
         currentEntry = line;
       } else {
@@ -176,7 +200,9 @@ function parseAuthors(authorStr) {
 
   return authorStr
     .split(/\s*(?:,\s*(?=[A-ZÇĞİÖŞÜ])|;\s*|&\s*|\bve\b\s*|\band\b\s*)/i)
-    .map(a => a.trim())
+    // Strip leftover separators at token edges (e.g. "B.," when "&" followed the comma),
+    // but keep the trailing period of initials like "B."
+    .map(a => a.trim().replace(/^[\s,;&]+/, '').replace(/[\s,;&]+$/, ''))
     .filter(a => a.length > 1 && !/^\d/.test(a))
     .slice(0, 10);
 }
