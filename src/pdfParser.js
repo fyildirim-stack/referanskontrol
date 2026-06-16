@@ -125,8 +125,10 @@ function formatPageToMarkdown(page) {
     if (!text) continue;
 
     // Detect headings (all caps, or section numbers like "1. Introduction")
-    const isHeading = 
-      (text.length > 3 && text.length < 100 && text === text.toUpperCase() && !/^\d+$/.test(text)) ||
+    // Not: yalnızca büyük harf olması yetmez; en az 2 ardışık harf içermeli ki
+    // "61–76", "14/10/2025", "50(1)" gibi sayı/tarih parçaları başlık sanılmasın.
+    const isHeading =
+      (text.length > 3 && text.length < 100 && text === text.toUpperCase() && /[A-ZÇĞİÖŞÜ]{2,}/.test(text)) ||
       (/^\d+(\.\d+)*\s+[A-ZÇĞİÖŞÜa-zçğıöşü]/.test(text) && text.length < 80) ||
       /^(Kaynakça|Kaynaklar|References|Bibliography|Referanslar|Ekler|Ek\s+\d+|Appendix|Appendices)/i.test(text);
 
@@ -201,13 +203,60 @@ function formatPageToMarkdown(page) {
 }
 
 /**
+ * Eşleştirme için bir satırı normalize et: küçük harf, bağımsız sayıları (sayfa
+ * numaraları) ve fazla boşlukları temizle. Böylece sayfa numarası satırın
+ * başında/sonunda ya da ORTASINDA olsa bile ("... Göçü 25 Zinciri ...") aynı
+ * koşan üst/altbilgi sayfalar arası eşleşir.
+ */
+function normalizeRunningLine(text) {
+  return String(text || '')
+    .toLowerCase()
+    .replace(/\b\d{1,4}\b/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Sayfalar arası tekrarlayan üst/altbilgi (running header/footer) satırlarını
+ * tespit eder. Bir makalenin kendi künyesi gibi her sayfada yinelenen satırlar
+ * kaynakçaya sızmasın diye kaldırılır.
+ * @returns {Set<string>} Kaldırılacak normalize satırlar kümesi
+ */
+function findRunningLines(pages) {
+  const pageMap = new Map(); // normalize metin -> sayfa numarası kümesi
+  pages.forEach((pg) => {
+    pg.lines.forEach((l) => {
+      const norm = normalizeRunningLine(l.text);
+      if (norm.length < 8) return; // çok kısa satırları atla
+      if (!pageMap.has(norm)) pageMap.set(norm, new Set());
+      pageMap.get(norm).add(pg.pageNumber);
+    });
+  });
+
+  const threshold = Math.max(3, Math.ceil(pages.length * 0.4));
+  const running = new Set();
+  for (const [norm, pset] of pageMap.entries()) {
+    if (pset.size >= threshold) running.add(norm);
+  }
+  return running;
+}
+
+/**
  * Extract text content from a PDF file as a single string (in Markdown format)
  * @param {File|Blob|ArrayBuffer} file
  * @returns {Promise<string>}
  */
 export async function readPdfFile(file) {
   const pages = await extractTextFromPdf(file);
-  return pages
+
+  // Koşan üst/altbilgileri (her sayfada yinelenen satırlar) tespit edip ayıkla
+  const running = findRunningLines(pages);
+  const cleanedPages = running.size === 0 ? pages : pages.map((pg) => ({
+    ...pg,
+    lines: pg.lines.filter((l) => !running.has(normalizeRunningLine(l.text))),
+  }));
+
+  return cleanedPages
     .map(page => formatPageToMarkdown(page))
     .join('\n\n');
 }

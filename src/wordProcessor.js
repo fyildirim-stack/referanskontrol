@@ -21,6 +21,7 @@ import {
   groupMissingCitations
 } from "./citationFinder.js";
 import { findFootnoteCitations } from "./footnoteCitationFinder.js";
+import { splitConcatenatedReferences } from "./services/referenceSplitter.js";
 import {
   parseReference,
   buildIsnadBibliography,
@@ -153,10 +154,12 @@ function buildReferenceEntries(referenceParagraphs) {
   referenceParagraphs.forEach((paragraph) => {
     const text = normalizeVisibleText(paragraph.rawText || paragraph.text);
     if (text.length > 5) {
-      entries.push({
-        text: text.replace(/^\s*\[\d+\]\s*/, ""),
-        paragraphIndex: paragraph.index
-      });
+      const cleaned = text.replace(/^\s*\[\d+\]\s*/, "");
+      // Tek paragrafa birleşmiş ardışık referansları ayır (PDF'te satır sınırları
+      // güvenilmez olduğundan birden çok kaynak tek bloğa düşebiliyor)
+      for (const part of splitConcatenatedReferences(cleaned)) {
+        entries.push({ text: part, paragraphIndex: paragraph.index });
+      }
     }
   });
   return entries;
@@ -603,7 +606,11 @@ export async function analyzePdf(file) {
 
     const cleanText = line.text.trim();
     const startsWithUrl = /^https?:\/\//i.test(cleanText);
-    const startsWithAccessDate = /^\((?:Erişim(?:\s+Tarihi)?|Access(?:\s+Date)?|Accessed|Son\s+Erişim)/i.test(cleanText);
+    // Erişim tarihi satırı, açılış parantezi kopmuş olsa bile ("Tarihi, 23/08/2025).")
+    // ya da yalnızca bir sayfa aralığıyla ("654–657.") başlayan satırlar, bir önceki
+    // referansın devamıdır.
+    const startsWithAccessDate = /^\(?\s*(?:Son\s+Erişim|Erişim|Tarihi|Access(?:ed|\s+Date)?)\b/i.test(cleanText);
+    const startsWithPageRange = /^\(?\s*\d{1,4}\s*[–-]\s*\d{1,4}\b/.test(cleanText);
 
     const prevLine = bibLines[i - 1];
     const isSamePage = prevLine.pageNumber === line.pageNumber;
@@ -618,9 +625,16 @@ export async function analyzePdf(file) {
     let isContinuation = false;
     const endsWithHyphen = currentBib.text.endsWith("-");
     const firstLetterMatch = cleanText.match(/\p{L}/u);
-    const startsWithLowercase = firstLetterMatch && 
-                                firstLetterMatch[0] === firstLetterMatch[0].toLowerCase() && 
+    const startsWithLowercase = firstLetterMatch &&
+                                firstLetterMatch[0] === firstLetterMatch[0].toLowerCase() &&
                                 firstLetterMatch[0] !== firstLetterMatch[0].toUpperCase();
+    // Satır tek bir baş harfle başlıyorsa ("B. ve Konradsen", "E. vd.") bu, bir
+    // önceki satırda kesilen çok-yazarlı listenin devamıdır — yeni referans değil.
+    const startsWithInitial = /^[A-ZÇĞİÖŞÜ]\.(?:\s|$)/.test(cleanText);
+    // Bir referans, cümle-sonu noktalamasıyla (".", "!", "?", olası kapanış
+    // tırnağı/parantezi) bitmiyorsa cümle ortasında kesilmiştir → sonraki satır
+    // onun devamıdır (örn. "... on the Axis of" + "Neoliberal Populist ...").
+    const currentEndsWithoutTerminal = !/[.!?]["”»)\]]?\s*$/u.test(currentBib.text.trim());
 
     const yearMatchInCurrent = findYearInReference(currentBib.text);
     let currentEndsWithYear = false;
@@ -632,7 +646,7 @@ export async function analyzePdf(file) {
       }
     }
 
-    if (endsWithHyphen || startsWithUrl || startsWithAccessDate || startsWithLowercase || currentEndsWithYear) {
+    if (endsWithHyphen || startsWithUrl || startsWithAccessDate || startsWithPageRange || startsWithLowercase || startsWithInitial || currentEndsWithYear || currentEndsWithoutTerminal) {
       isContinuation = true;
     } else if (isSamePage) {
       if (hasHangingIndent) {

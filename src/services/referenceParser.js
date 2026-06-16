@@ -3,6 +3,8 @@
  * Supports APA, Chicago, ISNAD-style references
  */
 
+import { splitConcatenatedReferences } from './referenceSplitter.js';
+
 /**
  * Parse bibliography text into individual reference objects
  * @param {string} text - Raw bibliography/reference list text
@@ -18,6 +20,9 @@ export function parseReferences(text) {
 
   // Split by numbered references (1. Author...) or by double newlines or by line breaks that look like separate entries
   let entries = splitIntoEntries(cleaned);
+
+  // Tek bloğa birleşmiş ardışık referansları "(YYYY)" sınırlarından ayır
+  entries = entries.flatMap((entry) => splitConcatenatedReferences(entry));
 
   return entries
     .map((entry, index) => parseEntry(entry.trim(), index))
@@ -159,28 +164,36 @@ function parseEntry(text, index) {
   // Clean trailing punctuation and spaces
   cleanedForParsing = cleanedForParsing.replace(/[,\.\s\-–]+$/, '').trim();
 
-  // Extract year
-  const yearMatch = cleanedForParsing.match(/\((\d{4})\)/);
-  if (yearMatch) {
-    ref.year = parseInt(yearMatch[1]);
-  } else {
-    const yearMatch2 = cleanedForParsing.match(/\b(19|20)\d{2}\b/);
-    if (yearMatch2) ref.year = parseInt(yearMatch2[0]);
-  }
+  // Author-date çıkarımı: ilk "(YYYY)" parantezi yazar/başlık sınırıdır.
+  // Hem "Yazar (Yıl) “Başlık”, Dergi, ..." (yıldan sonra nokta YOK) hem klasik
+  // "Yazar (Yıl). Başlık. Dergi." stilini, hem de tırnaksız kitap başlıklarını
+  // ("Yazar (Yıl) Kitap Adı , Yer: Yayınevi.") doğru işler.
+  const yearParen = cleanedForParsing.match(/\(((?:19|20)\d{2})[a-z]?\)/);
+  if (yearParen) {
+    ref.year = parseInt(yearParen[1], 10);
+    const yIdx = cleanedForParsing.indexOf(yearParen[0]);
+    // Sondaki virgül/noktalı virgül/boşlukları temizle ama baş harfin noktasını
+    // ("V.") KORU.
+    const authorPart = cleanedForParsing.slice(0, yIdx).trim().replace(/[,;\s]+$/, '');
+    // Klasik APA'da yıldan sonra nokta gelir ("(2020). Başlık"); onu at.
+    let afterYear = cleanedForParsing.slice(yIdx + yearParen[0].length).trim().replace(/^[.\s]+/, '');
 
-  // Try APA style: Author, A. B. (Year). Title. Journal, Volume(Issue), Pages.
-  // Using end anchor ($) and removing DOI/trailing punctuation beforehand ensures correct title capture
-  const apaMatch = cleanedForParsing.match(/^(.+?)\s*\((\d{4})\)\.\s*(.+?)(?:\.\s*(.+?))?(?:,\s*(\d+)(?:\((\d+)\))?,\s*([\d\-–]+))?$/);
-  if (apaMatch) {
-    ref.authors = parseAuthors(apaMatch[1]);
-    ref.year = parseInt(apaMatch[2]);
-    ref.title = cleanTitle(apaMatch[3]);
-    if (apaMatch[4]) ref.journal = apaMatch[4].replace(/\.\s*$/, '').trim();
-    if (apaMatch[5]) ref.volume = apaMatch[5];
-    if (apaMatch[6]) ref.issue = apaMatch[6];
-    if (apaMatch[7]) ref.pages = apaMatch[7];
+    if (authorPart) ref.authors = parseAuthors(authorPart);
+
+    const quoted = afterYear.match(/^["“«]\s*(.+?)\s*["”»]/u);
+    if (quoted) {
+      ref.title = cleanTitle(quoted[1]);
+      const rest = afterYear.slice(quoted[0].length).replace(/^[\s,]+/, '');
+      ref.journal = extractContainer(rest);
+    } else {
+      // Tırnaksız: başlık, güçlü bir ayraca kadar (" , " | ", Şehir:" | ". " | son)
+      const tMatch = afterYear.match(/^(.+?)(?:\s+,\s|,\s+[A-ZÇĞİÖŞÜ][^,:]*:|\.\s+|$)/u);
+      ref.title = cleanTitle(tMatch ? tMatch[1] : afterYear);
+      const afterTitle = tMatch ? afterYear.slice(tMatch[0].length) : '';
+      if (afterTitle) ref.journal = extractContainer(afterTitle.replace(/^[\s,]+/, ''));
+    }
   } else {
-    // Fallback: try to extract author and title more loosely
+    // "(YYYY)" yoksa son çare: noktadan böl
     const parts = cleanedForParsing.split(/\.\s+/);
     if (parts.length >= 2) {
       ref.authors = parseAuthors(parts[0]);
@@ -223,6 +236,19 @@ function parseAuthors(authorStr) {
     .map(a => a.trim().replace(/^[\s,;&|]+/, '').replace(/[\s,;&|]+$/, ''))
     .filter(a => a.length > 1 && !/^\d/.test(a))
     .slice(0, 10);
+}
+
+/**
+ * Bir referansın başlık-sonrası bölümünden dergi/kapsayıcı (container) adını çıkar.
+ * İlk cilt/sayı işaretine (", 16(", " , (2)," vb.) ya da " içinde" kalıbına kadar.
+ */
+function extractContainer(rest) {
+  if (!rest) return '';
+  let c = rest;
+  const volMatch = rest.match(/^(.+?)\s*,\s*[(\d]/u);
+  if (volMatch) c = volMatch[1];
+  c = c.replace(/\s+içinde\b.*$/iu, ''); // "... içinde, Yer: Yayınevi" → kapsayıcıyı kes
+  return c.replace(/[\s,.:]+$/u, '').trim();
 }
 
 /**
