@@ -91,9 +91,19 @@ export default function ReferenceCard({ result }) {
                 {matchDetails.confidence === 'high' ? 'Yüksek güven' : matchDetails.confidence === 'medium' ? 'Orta güven' : 'Düşük güven'}
               </span>
             )}
+            {(match?.isbn || parsed.isbn) && (
+              <span className="ref-match-tag">
+                <BookIcon /> ISBN: {match?.isbn || parsed.isbn}
+              </span>
+            )}
             {doiUrl && (
               <a href={doiUrl} target="_blank" rel="noreferrer" className="ref-match-tag" style={{ textDecoration: 'none' }}>
                 <ExternalLink /> DOI
+              </a>
+            )}
+            {!doiUrl && match?.url && (
+              <a href={match.url} target="_blank" rel="noreferrer" className="ref-match-tag" style={{ textDecoration: 'none' }}>
+                <ExternalLink /> Kaynak
               </a>
             )}
           </div>

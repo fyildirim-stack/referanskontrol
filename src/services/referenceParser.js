@@ -137,6 +137,7 @@ function parseEntry(text, index) {
     issue: '',
     pages: '',
     doi: '',
+    isbn: '',
     publisher: '',
   };
 
@@ -146,6 +147,13 @@ function parseEntry(text, index) {
   if (doiMatch) {
     ref.doi = doiMatch[1].replace(/[\.\)]+$/, '');
     cleanedForParsing = cleaned.replace(doiMatch[0], '').trim();
+  }
+
+  // Extract ISBN if present (e.g. "ISBN 978-3-16-148410-0" or a bare 13/10-digit ISBN)
+  const isbnMatch = cleaned.match(/ISBN(?:-1[03])?:?\s*((?:97[89][-\s]?)?(?:\d[-\s]?){9}[\dXx])/i);
+  if (isbnMatch) {
+    ref.isbn = isbnMatch[1].replace(/[-\s]/g, '');
+    cleanedForParsing = cleanedForParsing.replace(isbnMatch[0], '').trim();
   }
 
   // Clean trailing punctuation and spaces
@@ -176,7 +184,7 @@ function parseEntry(text, index) {
     const parts = cleanedForParsing.split(/\.\s+/);
     if (parts.length >= 2) {
       ref.authors = parseAuthors(parts[0]);
-      ref.title = cleanTitle(parts.length > 2 ? parts[1] : parts[1]);
+      ref.title = cleanTitle(parts[1]);
       if (parts.length > 2) ref.journal = parts[2].replace(/\.\s*$/, '').trim();
     } else {
       ref.title = cleanTitle(cleanedForParsing);
@@ -198,11 +206,21 @@ function parseEntry(text, index) {
 function parseAuthors(authorStr) {
   if (!authorStr) return [];
 
-  return authorStr
-    .split(/\s*(?:,\s*(?=[A-ZÇĞİÖŞÜ])|;\s*|&\s*|\bve\b\s*|\band\b\s*)/i)
-    // Strip leftover separators at token edges (e.g. "B.," when "&" followed the comma),
-    // but keep the trailing period of initials like "B."
-    .map(a => a.trim().replace(/^[\s,;&]+/, '').replace(/[\s,;&]+$/, ''))
+  // Yazar ayraçlarını ('&', ';', ' ve ', ' and ') tek bir sentinel'e (|) indir.
+  // Ardından yalnızca BAŞ HARFLER grubundan sonra gelen virgülde böl ("A.," → boundary),
+  // böylece "Soyadı, A." ikilisindeki (harften sonraki) virgül korunur ve baş harfler
+  // ayrı bir "yazar" olarak sızmaz.
+  const normalized = authorStr
+    .replace(/\s*&\s*/g, '|')
+    .replace(/\s*;\s*/g, '|')
+    .replace(/\s+\bve\b\s+/gi, '|')
+    .replace(/\s+\band\b\s+/gi, '|')
+    .replace(/\.\s*,\s*/g, '.|');
+
+  return normalized
+    .split('|')
+    // Token kenarlarındaki ayraç kalıntılarını temizle; baş harf noktasını koru ("B.").
+    .map(a => a.trim().replace(/^[\s,;&|]+/, '').replace(/[\s,;&|]+$/, ''))
     .filter(a => a.length > 1 && !/^\d/.test(a))
     .slice(0, 10);
 }

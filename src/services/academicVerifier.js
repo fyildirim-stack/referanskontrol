@@ -4,7 +4,29 @@
 
 import { searchOpenAlex } from './apis/openalexApi.js';
 import { searchCrossref } from './apis/crossrefApi.js';
+import { searchOpenLibrary } from './apis/openLibraryApi.js';
+import { searchGoogleBooks } from './apis/googleBooksApi.js';
+import { searchSemanticScholar } from './apis/semanticScholarApi.js';
 import { findBestMatch } from './matchScorer.js';
+import {
+  CONCURRENCY,
+  BATCH_DELAY_MS,
+  FOUND_THRESHOLD,
+  CONFIDENCE,
+  ENABLED_APIS,
+} from './verificationConfig.js';
+
+/** Kayıtlı API kaynakları (anahtar → etiket + arama fonksiyonu). */
+const API_REGISTRY = {
+  openalex: { label: 'OpenAlex', search: searchOpenAlex },
+  crossref: { label: 'Crossref', search: searchCrossref },
+  openLibrary: { label: 'Open Library', search: searchOpenLibrary },
+  googleBooks: { label: 'Google Books', search: searchGoogleBooks },
+  semanticScholar: { label: 'Semantic Scholar', search: searchSemanticScholar },
+};
+
+/** ENABLED_APIS sırasına göre etkin kaynaklar. */
+const ACTIVE_APIS = ENABLED_APIS.map((key) => API_REGISTRY[key]).filter(Boolean);
 
 /**
  * Verify a list of parsed references against academic databases
@@ -17,7 +39,6 @@ export async function verifyReferences(references, onProgress) {
 
   const results = [];
   const total = references.length;
-  const CONCURRENCY = 3; // Max parallel requests
 
   // Process in batches
   for (let i = 0; i < references.length; i += CONCURRENCY) {
@@ -35,7 +56,7 @@ export async function verifyReferences(references, onProgress) {
 
     // Small delay between batches to respect rate limits
     if (i + CONCURRENCY < references.length) {
-      await delay(300);
+      await delay(BATCH_DELAY_MS);
     }
   }
 
@@ -43,26 +64,30 @@ export async function verifyReferences(references, onProgress) {
 }
 
 /**
- * Verify a single reference against all available APIs
+ * Verify a single reference against all active APIs
  */
 async function verifyOneReference(reference) {
   const searchParams = {
     title: reference.title,
     author: reference.authors?.[0] || '',
     year: reference.year,
+    isbn: reference.isbn || '',
   };
 
-  // Search CORS-enabled APIs in parallel
-  const [openalexResults, crossrefResults] = await Promise.allSettled([
-    searchOpenAlex(searchParams),
-    searchCrossref(searchParams),
-  ]);
+  // Tüm etkin kaynakları paralel ara (her biri kendi retry/backoff'unu uygular)
+  const settled = await Promise.allSettled(
+    ACTIVE_APIS.map(api => api.search(searchParams))
+  );
 
-  // Collect all results
-  const allResults = [
-    ...(openalexResults.status === 'fulfilled' && openalexResults.value ? openalexResults.value : []),
-    ...(crossrefResults.status === 'fulfilled' && crossrefResults.value ? crossrefResults.value : []),
-  ];
+  // Sonuçları topla
+  const allResults = settled.flatMap((s) =>
+    s.status === 'fulfilled' && s.value ? s.value : []
+  );
+
+  // Hangi kaynaklar yanıt verdi (hata fırlatmadı)
+  const searchedApis = settled
+    .map((s, i) => (s.status === 'fulfilled' ? ACTIVE_APIS[i].label : null))
+    .filter(Boolean);
 
   // Find best match across all results
   const bestResult = findBestMatch(reference, allResults);
@@ -76,20 +101,23 @@ async function verifyOneReference(reference) {
       year: reference.year,
       journal: reference.journal,
       doi: reference.doi,
+      isbn: reference.isbn,
       pages: reference.pages,
     },
-    found: bestResult !== null && bestResult.score >= 40,
+    found: bestResult !== null && bestResult.score >= FOUND_THRESHOLD,
     match: bestResult ? {
       ...bestResult.match,
       score: bestResult.score,
     } : null,
-    searchedApis: [
-      openalexResults.status === 'fulfilled' ? 'OpenAlex' : null,
-      crossrefResults.status === 'fulfilled' ? 'Crossref' : null,
-    ].filter(Boolean),
+    searchedApis,
     matchDetails: bestResult ? {
       source: bestResult.match.source,
-      confidence: bestResult.score >= 80 ? 'high' : bestResult.score >= 60 ? 'medium' : 'low',
+      confidence:
+        bestResult.score >= CONFIDENCE.high
+          ? 'high'
+          : bestResult.score >= CONFIDENCE.medium
+            ? 'medium'
+            : 'low',
       score: bestResult.score,
     } : null,
   };

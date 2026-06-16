@@ -46,6 +46,7 @@ export function generateTextReport(results, fileName) {
       if (r.match) {
         lines.push(`   ✅ Kaynak: ${r.match.source} | Skor: ${r.match.score}/100`);
         if (r.match.doi) lines.push(`   DOI: ${r.match.doi}`);
+        if (r.match.isbn || r.parsed.isbn) lines.push(`   ISBN: ${r.match.isbn || r.parsed.isbn}`);
         if (r.match.url) lines.push(`   URL: ${r.match.url}`);
       }
       lines.push('');
@@ -72,7 +73,7 @@ export function generateTextReport(results, fileName) {
   lines.push(
     '═══════════════════════════════════════════════════════',
     'Bu rapor Referans Kontrol tarafından otomatik oluşturulmuştur.',
-    'OpenAlex, Crossref ve Semantic Scholar veritabanları kullanılmıştır.',
+    'OpenAlex, Crossref, Open Library, Google Books ve Semantic Scholar veritabanları kullanılmıştır.',
     '═══════════════════════════════════════════════════════',
   );
 
